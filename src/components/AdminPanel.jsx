@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useShop } from '../context/ShopContext';
 import { CATEGORIES } from '../data/products';
 import { isFirebaseConfigured } from '../services/firebaseService';
+import { AdminReportsView } from './AdminReportsView';
 import {
   LayoutDashboard,
   Package,
@@ -40,7 +41,12 @@ import {
   Phone,
   MapPin,
   Sparkles,
-  Menu
+  Menu,
+  BarChart3,
+  Calendar,
+  PieChart,
+  TrendingDown,
+  AlertCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -155,6 +161,10 @@ export const AdminPanel = () => {
     };
   });
 
+  // Business Reports Analytics State
+  const [activeReportSubTab, setActiveReportSubTab] = useState('monthly'); // 'monthly', 'sales', 'out-of-stock', 'income'
+  const [reportDateFilter, setReportDateFilter] = useState('all'); // 'all', 'this-month', 'last-month', 'year'
+
   // New Product Form Data
   const [newProductData, setNewProductData] = useState({
     title: '',
@@ -218,10 +228,151 @@ export const AdminPanel = () => {
     const current = target.stockCount !== undefined ? target.stockCount : 0;
     const newCount = current + addAmount;
     updateProductStock(productId, newCount);
-    if (showToast) {
-      showToast(`📦 Added +${addAmount} to "${target.title}"! New Stock: ${newCount}`);
-    }
   };
+
+  // Business Report Computations
+  const monthlyReportData = useMemo(() => {
+    const monthlyMap = {};
+    orders.forEach((order) => {
+      const date = order.date ? new Date(order.date) : new Date();
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      const monthLabel = date.toLocaleString('default', { month: 'short', year: 'numeric' });
+
+      if (!monthlyMap[monthKey]) {
+        monthlyMap[monthKey] = {
+          monthKey,
+          label: monthLabel,
+          orderCount: 0,
+          grossRevenue: 0,
+          deliveredRevenue: 0,
+          discounts: 0,
+          shippingFees: 0,
+          itemsSold: 0
+        };
+      }
+
+      monthlyMap[monthKey].orderCount += 1;
+      monthlyMap[monthKey].grossRevenue += order.total || 0;
+      if (order.status === 'Delivered') {
+        monthlyMap[monthKey].deliveredRevenue += order.total || 0;
+      }
+      monthlyMap[monthKey].discounts += order.discount || 0;
+      monthlyMap[monthKey].shippingFees += order.shippingFee || 0;
+      monthlyMap[monthKey].itemsSold += (order.items || []).reduce((sum, it) => sum + (it.quantity || 1), 0);
+    });
+
+    const list = Object.values(monthlyMap).sort((a, b) => b.monthKey.localeCompare(a.monthKey));
+    return list;
+  }, [orders]);
+
+  const salesReportData = useMemo(() => {
+    const statusCounts = {
+      Delivered: { count: 0, revenue: 0 },
+      Dispatched: { count: 0, revenue: 0 },
+      Processing: { count: 0, revenue: 0 },
+      Pending: { count: 0, revenue: 0 },
+      Cancelled: { count: 0, revenue: 0 }
+    };
+
+    const categorySales = {
+      men: { count: 0, revenue: 0, name: "Men's Collection" },
+      women: { count: 0, revenue: 0, name: "Women's Footwear" },
+      kids: { count: 0, revenue: 0, name: "Kids' Collection" },
+      accessories: { count: 0, revenue: 0, name: "Bags & Accessories" }
+    };
+
+    const productSalesMap = {};
+
+    orders.forEach((order) => {
+      const st = order.status || 'Pending';
+      if (!statusCounts[st]) {
+        statusCounts[st] = { count: 0, revenue: 0 };
+      }
+      statusCounts[st].count += 1;
+      statusCounts[st].revenue += order.total || 0;
+
+      (order.items || []).forEach((item) => {
+        const cat = item.category || 'men';
+        if (categorySales[cat]) {
+          categorySales[cat].count += item.quantity || 1;
+          categorySales[cat].revenue += (item.price || 0) * (item.quantity || 1);
+        }
+
+        const pId = item.id || item.title;
+        if (!productSalesMap[pId]) {
+          productSalesMap[pId] = {
+            id: pId,
+            title: item.title,
+            image: item.image,
+            price: item.price,
+            category: item.category,
+            quantitySold: 0,
+            revenueGenerated: 0
+          };
+        }
+        productSalesMap[pId].quantitySold += item.quantity || 1;
+        productSalesMap[pId].revenueGenerated += (item.price || 0) * (item.quantity || 1);
+      });
+    });
+
+    const topSellingProducts = Object.values(productSalesMap)
+      .sort((a, b) => b.quantitySold - a.quantitySold)
+      .slice(0, 8);
+
+    return {
+      statusCounts,
+      categorySales,
+      topSellingProducts,
+      totalItemsSold: Object.values(categorySales).reduce((s, c) => s + c.count, 0)
+    };
+  }, [orders]);
+
+  const outOfStockReportData = useMemo(() => {
+    const soldOut = products.filter((p) => (p.stockCount !== undefined ? p.stockCount : 15) === 0);
+    const lowStock = products.filter((p) => {
+      const stock = p.stockCount !== undefined ? p.stockCount : 15;
+      return stock > 0 && stock <= 5;
+    });
+    const healthyStock = products.filter((p) => (p.stockCount !== undefined ? p.stockCount : 15) > 5);
+
+    const lostRevenuePotential = soldOut.reduce((sum, p) => sum + (p.price || 0) * 5, 0);
+
+    return {
+      soldOut,
+      lowStock,
+      healthyStock,
+      totalAlerts: soldOut.length + lowStock.length,
+      lostRevenuePotential
+    };
+  }, [products]);
+
+  const incomeReportData = useMemo(() => {
+    const grossBilled = orders.reduce((sum, o) => sum + (o.total || 0), 0);
+    const cashRealized = orders
+      .filter((o) => o.status === 'Delivered')
+      .reduce((sum, o) => sum + (o.total || 0), 0);
+    const inTransit = orders
+      .filter((o) => o.status === 'Dispatched' || o.status === 'Processing')
+      .reduce((sum, o) => sum + (o.total || 0), 0);
+    const pendingCollection = orders
+      .filter((o) => o.status === 'Pending')
+      .reduce((sum, o) => sum + (o.total || 0), 0);
+    const totalDiscountsGiven = orders.reduce((sum, o) => sum + (o.discount || 0), 0);
+    const estimatedCOGS = Math.round(cashRealized * 0.58);
+    const estimatedPackagingShipping = orders.filter((o) => o.status === 'Delivered').length * 200;
+    const netProfitEstimated = cashRealized - estimatedCOGS - estimatedPackagingShipping;
+
+    return {
+      grossBilled,
+      cashRealized,
+      inTransit,
+      pendingCollection,
+      totalDiscountsGiven,
+      estimatedCOGS,
+      estimatedPackagingShipping,
+      netProfitEstimated
+    };
+  }, [orders]);
 
   // Filtered Products
   const filteredProducts = useMemo(() => {
@@ -593,6 +744,24 @@ export const AdminPanel = () => {
               )}
             </button>
 
+            {/* 3B. Business Reports & Analytics */}
+            <button
+              onClick={() => { setActiveTab('reports'); setMobileSidebarOpen(false); }}
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                activeTab === 'reports'
+                  ? 'bg-neutral-950 text-white shadow-md font-extrabold translate-x-1'
+                  : 'text-gray-600 hover:text-neutral-950 hover:bg-pink-50'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <BarChart3 className={`w-4 h-4 ${activeTab === 'reports' ? 'text-pink-300' : 'text-pink-600'}`} />
+                <span>Business Reports</span>
+              </div>
+              <span className="text-[10px] bg-pink-100 text-pink-700 font-extrabold px-2 py-0.5 rounded-full uppercase">
+                Analytics
+              </span>
+            </button>
+
             {/* 3B. Manager Record */}
             <button
               onClick={() => { setActiveTab('manager'); setMobileSidebarOpen(false); }}
@@ -758,6 +927,7 @@ export const AdminPanel = () => {
                 {activeTab === 'dashboard' && 'Executive Performance Dashboard'}
                 {activeTab === 'products' && 'Inventory Management & Catalogue'}
                 {activeTab === 'orders' && 'Order Processing & Dispatch Hub'}
+                {activeTab === 'reports' && 'Executive Business Reports & Financial Analytics'}
                 {activeTab === 'manager' && 'Store Manager Record & Audit'}
                 {activeTab === 'customers' && 'Customer Relationship Management'}
                 {activeTab === 'coupons' && 'Promotions & Coupons'}
@@ -2444,6 +2614,22 @@ export const AdminPanel = () => {
                 </div>
               </form>
             </div>
+          )}
+
+          {/* ======================================================== */}
+          {/* 📊 BUSINESS REPORTS & FINANCIAL ANALYTICS TAB */}
+          {/* ======================================================== */}
+          {activeTab === 'reports' && (
+            <AdminReportsView
+              activeReportSubTab={activeReportSubTab}
+              setActiveReportSubTab={setActiveReportSubTab}
+              monthlyReportData={monthlyReportData}
+              salesReportData={salesReportData}
+              outOfStockReportData={outOfStockReportData}
+              incomeReportData={incomeReportData}
+              handleQuickRestock={handleQuickRestock}
+              getProductUnitLabel={getProductUnitLabel}
+            />
           )}
 
         </div>
