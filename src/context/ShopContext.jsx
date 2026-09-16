@@ -194,6 +194,7 @@ export const ShopProvider = ({ children }) => {
   const [isTrackingOpen, setIsTrackingOpen] = useState(false);
   const [searchTrackingId, setSearchTrackingId] = useState('');
   const [isCustomerAccountOpen, setIsCustomerAccountOpen] = useState(false);
+  const [customerAccountTab, setCustomerAccountTab] = useState('orders'); // 'orders' | 'wishlist' | 'profile'
   const [customerProfile, setCustomerProfile] = useState(() => {
     try {
       const saved = localStorage.getItem('stylish_customer_profile');
@@ -210,6 +211,54 @@ export const ShopProvider = ({ children }) => {
     } catch {
       // ignore
     }
+  };
+
+  // Newsletter Email Subscribers for Admin CRM & Marketing
+  const [subscribers, setSubscribers] = useState(() => {
+    try {
+      const saved = localStorage.getItem('stylish_newsletter_subscribers');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return [
+      { id: 'sub-1', email: 'irshad.customer@gmail.com', date: '25 Aug 2026', source: 'Storefront Footer' },
+      { id: 'sub-2', email: 'ayesha.style@yahoo.com', date: '24 Aug 2026', source: 'Storefront Footer' },
+      { id: 'sub-3', email: 'hamza.leather@outlook.com', date: '23 Aug 2026', source: 'Storefront Footer' }
+    ];
+  });
+
+  const addSubscriber = (email) => {
+    if (!email || !email.includes('@')) {
+      showToast('⚠️ Please provide a valid email address!');
+      return false;
+    }
+    const cleanEmail = email.trim().toLowerCase();
+    const exists = subscribers.some((s) => s.email.toLowerCase() === cleanEmail);
+    if (exists) {
+      showToast('ℹ️ You are already subscribed to our VIP newsletter!');
+      return true;
+    }
+    const newSub = {
+      id: `sub-${Date.now()}`,
+      email: cleanEmail,
+      date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
+      source: 'Storefront Footer'
+    };
+    const updated = [newSub, ...subscribers];
+    setSubscribers(updated);
+    try {
+      localStorage.setItem('stylish_newsletter_subscribers', JSON.stringify(updated));
+    } catch {}
+    showToast('🎉 Thank you for subscribing! VIP discount unlocked.');
+    return true;
+  };
+
+  const deleteSubscriber = (idOrEmail) => {
+    const updated = subscribers.filter((s) => s.id !== idOrEmail && s.email !== idOrEmail);
+    setSubscribers(updated);
+    try {
+      localStorage.setItem('stylish_newsletter_subscribers', JSON.stringify(updated));
+    } catch {}
+    showToast('Subscriber removed.');
   };
 
   // Admin Security & Auth State with Persistent Session
@@ -957,8 +1006,13 @@ export const ShopProvider = ({ children }) => {
         setSearchTrackingId,
         isCustomerAccountOpen,
         setIsCustomerAccountOpen,
+        customerAccountTab,
+        setCustomerAccountTab,
         customerProfile,
         saveCustomerProfile,
+        subscribers,
+        addSubscriber,
+        deleteSubscriber,
         isAdminMode,
         setIsAdminMode,
         isAdminAuthOpen,

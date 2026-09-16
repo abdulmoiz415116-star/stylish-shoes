@@ -1,21 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useShop } from '../context/ShopContext';
-import { User, Package, MapPin, Phone, Mail, X, CheckCircle2, Clock, Truck, Eye } from 'lucide-react';
+import { User, Package, MapPin, Phone, Mail, X, CheckCircle2, Clock, Truck, Eye, Heart, ShoppingBag, Trash2, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const CustomerAccountModal = () => {
   const {
     isCustomerAccountOpen,
     setIsCustomerAccountOpen,
+    customerAccountTab,
+    setCustomerAccountTab,
     customerProfile,
     saveCustomerProfile,
     orders,
+    wishlist,
+    products,
+    toggleWishlist,
+    addToCart,
     setOrderReceipt,
     setIsCheckoutOpen,
     showToast
   } = useShop();
 
-  const [activeTab, setActiveTab] = useState('orders'); // 'orders' or 'profile'
+  const [activeTab, setActiveTab] = useState('orders'); // 'orders' | 'wishlist' | 'profile'
   const [profileForm, setProfileForm] = useState(() => ({
     fullName: customerProfile?.fullName || '',
     phone: customerProfile?.phone || '',
@@ -24,21 +30,56 @@ export const CustomerAccountModal = () => {
     city: customerProfile?.city || 'Lahore'
   }));
 
-  if (!isCustomerAccountOpen) return null;
+  // Sync tab with global customerAccountTab whenever opened
+  useEffect(() => {
+    if (customerAccountTab) {
+      setActiveTab(customerAccountTab);
+    }
+  }, [customerAccountTab, isCustomerAccountOpen]);
 
-  const handleProfileSave = (e) => {
-    e.preventDefault();
-    saveCustomerProfile(profileForm);
-    if (showToast) showToast('✅ Customer profile saved! Addresses will now auto-fill at checkout.');
-  };
+  // Keep profileForm in sync with customerProfile
+  useEffect(() => {
+    if (customerProfile) {
+      setProfileForm({
+        fullName: customerProfile.fullName || '',
+        phone: customerProfile.phone || '',
+        email: customerProfile.email || '',
+        address: customerProfile.address || '',
+        city: customerProfile.city || 'Lahore'
+      });
+    }
+  }, [customerProfile]);
 
-  // Filter orders matching customer's phone or show all placed orders from this browser
-  const customerOrders = orders.filter((o) => {
-    if (!profileForm.phone) return true;
-    const cleanP = profileForm.phone.replace(/[^0-9]/g, '');
-    const orderP = (o.customer?.phone || '').replace(/[^0-9]/g, '');
-    return cleanP === '' || orderP.includes(cleanP) || cleanP.includes(orderP);
-  });
+  // Read order IDs placed from this device
+  const localOrderIds = useMemo(() => {
+    try {
+      const saved = localStorage.getItem('stylish_my_order_ids');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  }, [orders, isCustomerAccountOpen]);
+
+  // Filter orders matching customer's phone or device placed order IDs
+  const customerOrders = useMemo(() => {
+    return orders.filter((o) => {
+      if (o.orderId && localOrderIds.includes(o.orderId)) return true;
+      if (profileForm.phone) {
+        const cleanP = profileForm.phone.replace(/[^0-9]/g, '');
+        const orderP = (o.customer?.phone || '').replace(/[^0-9]/g, '');
+        if (cleanP && orderP && (cleanP.includes(orderP) || orderP.includes(cleanP))) {
+          return true;
+        }
+      }
+      if (!profileForm.phone && localOrderIds.length === 0) return true;
+      return false;
+    });
+  }, [orders, localOrderIds, profileForm.phone]);
+
+  // Filter wishlisted products
+  const wishlistedProducts = useMemo(() => {
+    return products.filter((p) => wishlist.includes(p.id));
+  }, [products, wishlist]);
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 font-poppins">
@@ -73,24 +114,46 @@ export const CustomerAccountModal = () => {
           </div>
 
           {/* Nav Tabs */}
-          <div className="flex gap-2 border-b border-gray-100 pb-2">
+          <div className="flex flex-wrap gap-2 border-b border-gray-100 pb-3">
             <button
-              onClick={() => setActiveTab('orders')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all ${
+              onClick={() => {
+                setActiveTab('orders');
+                if (typeof setCustomerAccountTab === 'function') setCustomerAccountTab('orders');
+              }}
+              className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer ${
                 activeTab === 'orders'
                   ? 'bg-black text-white shadow-md'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  : 'text-gray-600 hover:bg-pink-50 hover:text-neutral-950'
               }`}
             >
               <Package className="w-4 h-4 text-amber-400" />
               <span>My Orders ({customerOrders.length})</span>
             </button>
+
             <button
-              onClick={() => setActiveTab('profile')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all ${
+              onClick={() => {
+                setActiveTab('wishlist');
+                if (typeof setCustomerAccountTab === 'function') setCustomerAccountTab('wishlist');
+              }}
+              className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer ${
+                activeTab === 'wishlist'
+                  ? 'bg-black text-white shadow-md'
+                  : 'text-gray-600 hover:bg-pink-50 hover:text-neutral-950'
+              }`}
+            >
+              <Heart className="w-4 h-4 text-pink-500 fill-pink-500" />
+              <span>Wishlist ({wishlistedProducts.length})</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setActiveTab('profile');
+                if (typeof setCustomerAccountTab === 'function') setCustomerAccountTab('profile');
+              }}
+              className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer ${
                 activeTab === 'profile'
                   ? 'bg-black text-white shadow-md'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  : 'text-gray-600 hover:bg-pink-50 hover:text-neutral-950'
               }`}
             >
               <MapPin className="w-4 h-4 text-pink-400" />
@@ -163,8 +226,112 @@ export const CustomerAccountModal = () => {
               )}
             </div>
           )}
+          {/* ======================================================== */}
+          {/* TAB 2: LIVE WISHLIST (خواہش لسٹ)                         */}
+          {/* ======================================================== */}
+          {activeTab === 'wishlist' && (
+            <div className="space-y-4">
+              <div className="bg-pink-50/70 p-3.5 rounded-2xl border border-pink-100 text-[11px] text-gray-800 flex items-center justify-between">
+                <div>
+                  <strong>💖 Your Saved Wishlist:</strong> Keep track of footwear you love &amp; purchase whenever you're ready.
+                </div>
+                <span className="text-xs font-black bg-pink-600 text-white px-2.5 py-0.5 rounded-full">
+                  {wishlistedProducts.length} Items
+                </span>
+              </div>
 
-          {/* TAB 2: SHIPPING PROFILE & FAST CHECKOUT */}
+              {wishlistedProducts.length > 0 ? (
+                <div className="space-y-3">
+                  {wishlistedProducts.map((p) => {
+                    const inStock = (p.stockCount !== undefined ? p.stockCount : 15) > 0;
+                    return (
+                      <div
+                        key={p.id}
+                        className="p-3.5 bg-white rounded-2xl border border-pink-100 hover:border-pink-300 transition-all flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs"
+                      >
+                        <div className="flex items-center gap-3 w-full sm:w-auto min-w-0">
+                          <img
+                            src={p.image}
+                            alt={p.title}
+                            className="w-16 h-16 rounded-xl object-cover border border-pink-100 flex-shrink-0"
+                          />
+                          <div className="min-w-0">
+                            <span className="text-[10px] font-bold text-pink-600 uppercase tracking-wider block">
+                              {p.category} &bull; {p.subcategory || 'Style'}
+                            </span>
+                            <h4 className="text-xs font-extrabold text-neutral-950 truncate">
+                              {p.title}
+                            </h4>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="text-xs font-black text-pink-700">
+                                Rs. {p.price.toLocaleString()}
+                              </span>
+                              {p.originalPrice && (
+                                <span className="text-[10px] text-gray-400 line-through">
+                                  Rs. {p.originalPrice.toLocaleString()}
+                                </span>
+                              )}
+                              <span
+                                className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full ${
+                                  inStock ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                                }`}
+                              >
+                                {inStock ? 'In Stock' : 'Out of Stock'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Actions: Add to Cart & Remove */}
+                        <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                          <button
+                            onClick={() => {
+                              addToCart(p, p.colors?.[0] || 'Standard', p.sizes?.[0] || 'Standard', 1);
+                              if (showToast) showToast(`🛍️ "${p.title}" added to your bag!`);
+                            }}
+                            disabled={!inStock}
+                            className={`flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-sm cursor-pointer ${
+                              inStock
+                                ? 'bg-neutral-950 hover:bg-pink-600 text-white active:scale-95'
+                                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                            }`}
+                          >
+                            <ShoppingBag className="w-3.5 h-3.5" />
+                            <span>Add to Cart</span>
+                          </button>
+
+                          <button
+                            onClick={() => toggleWishlist(p.id)}
+                            className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
+                            title="Remove from Wishlist"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-gray-500 space-y-3">
+                  <Heart className="w-12 h-12 mx-auto text-pink-200" />
+                  <p className="text-xs font-bold text-gray-700">Your Wishlist is currently empty!</p>
+                  <p className="text-[11px] text-gray-400">
+                    Click the heart icon on any shoe or bag to save it here for quick viewing.
+                  </p>
+                  <button
+                    onClick={() => setIsCustomerAccountOpen(false)}
+                    className="inline-flex items-center gap-1.5 bg-neutral-950 hover:bg-pink-600 text-white px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all shadow cursor-pointer mt-2"
+                  >
+                    <span>Browse Collection</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 3: SHIPPING PROFILE & FAST CHECKOUT */}
           {activeTab === 'profile' && (
             <form onSubmit={handleProfileSave} className="space-y-4 text-xs font-semibold">
               <div className="bg-pink-50 p-3.5 rounded-2xl border border-pink-100 text-[11px] text-black leading-relaxed">

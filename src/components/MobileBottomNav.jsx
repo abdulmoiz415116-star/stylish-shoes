@@ -8,6 +8,7 @@ export const MobileBottomNav = () => {
     wishlist,
     setIsCartOpen,
     setIsCustomerAccountOpen,
+    setCustomerAccountTab,
     setSelectedCategory,
     setSelectedSubcategory,
     setSearchQuery,
@@ -61,6 +62,7 @@ export const MobileBottomNav = () => {
         {/* 3. Wishlist */}
         <button
           onClick={() => {
+            if (typeof setCustomerAccountTab === 'function') setCustomerAccountTab('wishlist');
             setIsCustomerAccountOpen(true);
           }}
           className="flex flex-col items-center justify-center p-1.5 text-neutral-700 hover:text-pink-600 transition-colors cursor-pointer relative group"
@@ -73,7 +75,7 @@ export const MobileBottomNav = () => {
               </span>
             )}
           </div>
-          <span className="text-[10px] font-bold tracking-tight mt-0.5">Saved</span>
+          <span className="text-[10px] font-bold tracking-tight mt-0.5">Wishlist</span>
         </button>
 
         {/* 4. Cart Button (Highlighted) */}
@@ -94,7 +96,10 @@ export const MobileBottomNav = () => {
 
         {/* 5. Account / Tracking */}
         <button
-          onClick={() => setIsCustomerAccountOpen(true)}
+          onClick={() => {
+            if (typeof setCustomerAccountTab === 'function') setCustomerAccountTab('orders');
+            setIsCustomerAccountOpen(true);
+          }}
           className="flex flex-col items-center justify-center p-1.5 text-neutral-700 hover:text-pink-600 transition-colors cursor-pointer group"
         >
           <User className="w-5 h-5 group-hover:scale-110 transition-transform" />

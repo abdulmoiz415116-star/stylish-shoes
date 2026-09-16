@@ -27,6 +27,7 @@ export const Header = () => {
     adminEmail,
     setIsTrackingOpen,
     setIsCustomerAccountOpen,
+    setCustomerAccountTab,
     setQuickViewProduct,
   } = useShop();
 
@@ -404,18 +405,38 @@ export const Header = () => {
               <Lock className="w-4 h-4" />
             </button>
 
-            {/* Wishlist (Shown on desktop/tablet, mobile uses MobileBottomNav) */}
+            {/* Wishlist (Shown on desktop & tablet, opens dedicated Wishlist tab) */}
             <button
-              onClick={() => handleCategorySelect('all')}
-              className="hidden sm:flex relative p-2 text-gray-700 hover:text-pink-600 transition-colors cursor-pointer"
-              title="Wishlist"
+              onClick={() => {
+                if (typeof setCustomerAccountTab === 'function') setCustomerAccountTab('wishlist');
+                setIsCustomerAccountOpen(true);
+              }}
+              className="relative p-1.5 sm:p-2 text-gray-700 hover:text-pink-600 hover:bg-pink-50 rounded-full transition-all cursor-pointer"
+              title={`Wishlist (${wishlist.length} saved items)`}
+              aria-label="View Saved Wishlist"
             >
               <Heart className="w-5 h-5" />
               {wishlist.length > 0 && (
-                <span className="absolute 0 top-1 right-1 bg-pink-600 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-pink-600 text-white text-[10px] font-extrabold rounded-full w-4 h-4 flex items-center justify-center ring-2 ring-white">
                   {wishlist.length}
                 </span>
               )}
+            </button>
+
+            {/* Customer Account / My Profile Trigger (Top-Right Corner) */}
+            <button
+              onClick={() => {
+                if (typeof setCustomerAccountTab === 'function') setCustomerAccountTab('orders');
+                setIsCustomerAccountOpen(true);
+              }}
+              className="relative p-1.5 sm:p-2 text-gray-700 hover:text-pink-600 hover:bg-pink-50 rounded-full transition-all cursor-pointer flex items-center gap-1.5"
+              title="My Account, Orders & Profile"
+              aria-label="My Account"
+            >
+              <User className="w-5 h-5" />
+              <span className="hidden xl:inline text-xs font-bold text-gray-700 hover:text-pink-600">
+                My Account
+              </span>
             </button>
 
             {/* Cart Button */}

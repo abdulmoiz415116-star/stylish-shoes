@@ -22,7 +22,9 @@ export const CheckoutModal = () => {
     addOrder,
     showToast,
     customerProfile,
-    saveCustomerProfile
+    saveCustomerProfile,
+    setIsCustomerAccountOpen,
+    setCustomerAccountTab
   } = useShop();
 
   const [checkoutPromoInput, setCheckoutPromoInput] = useState('');
@@ -147,6 +149,15 @@ export const CheckoutModal = () => {
     // Add order to global state & deduct inventory stock automatically
     addOrder(newOrderObj);
     
+    // Save order ID to local device memory so it instantly appears under "My Orders"
+    try {
+      const existingIds = JSON.parse(localStorage.getItem('stylish_my_order_ids') || '[]');
+      if (!existingIds.includes(generatedOrderId)) {
+        existingIds.unshift(generatedOrderId);
+        localStorage.setItem('stylish_my_order_ids', JSON.stringify(existingIds));
+      }
+    } catch {}
+
     // Save profile for fast future checkout
     saveCustomerProfile({
       fullName: formData.fullName,
@@ -359,7 +370,7 @@ export const CheckoutModal = () => {
                 </button>
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <button
                   type="button"
                   onClick={copyReceiptToClipboard}
@@ -367,6 +378,20 @@ export const CheckoutModal = () => {
                 >
                   <Copy className="w-3.5 h-3.5" />
                   <span>Copy Receipt</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOrderReceipt(null);
+                    setIsCheckoutOpen(false);
+                    if (typeof setCustomerAccountTab === 'function') setCustomerAccountTab('orders');
+                    setIsCustomerAccountOpen(true);
+                  }}
+                  className="flex-1 bg-gradient-to-r from-neutral-950 to-pink-600 hover:from-neutral-900 hover:to-pink-700 text-white py-3 rounded-xl font-extrabold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow"
+                >
+                  <Package className="w-3.5 h-3.5 text-amber-300" />
+                  <span>View in My Orders</span>
                 </button>
 
                 <button

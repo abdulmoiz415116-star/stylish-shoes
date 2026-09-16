@@ -46,7 +46,9 @@ import {
   Calendar,
   PieChart,
   TrendingDown,
-  AlertCircle
+  AlertCircle,
+  Mail,
+  Copy
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -71,7 +73,9 @@ export const AdminPanel = () => {
     setIsAdminAuthOpen,
     lockAdminSession,
     adminEmail,
-    showToast
+    showToast,
+    subscribers,
+    deleteSubscriber
   } = useShop();
 
   const handleExitToStorefront = () => {
@@ -2298,6 +2302,123 @@ export const AdminPanel = () => {
                     </a>
                   </div>
                 ))}
+              </div>
+
+              {/* ======================================================== */}
+              {/* 📧 NEWSLETTER & EMAIL SUBSCRIBERS / MARKETING LEADS    */}
+              {/* ======================================================== */}
+              <div className="bg-white p-6 rounded-2xl border border-pink-100 shadow-sm space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-pink-100 pb-3">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-5 h-5 text-pink-600" />
+                      <h3 className="font-black text-neutral-950 text-sm uppercase tracking-wide">
+                        Newsletter Subscribers &amp; Email Leads ({subscribers?.length || 0})
+                      </h3>
+                      <span className="text-[10px] bg-pink-100 text-pink-700 font-extrabold px-2 py-0.5 rounded-full uppercase">
+                        Marketing
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Storefront footer subscribers captured for marketing announcements, promotional codes &amp; sales alerts.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!subscribers || subscribers.length === 0) {
+                          showToast('⚠️ No subscribers found to copy!');
+                          return;
+                        }
+                        const emailList = subscribers.map((s) => s.email).join(', ');
+                        navigator.clipboard.writeText(emailList);
+                        showToast(`📋 Copied ${subscribers.length} subscriber email(s) to clipboard!`);
+                      }}
+                      className="px-3 py-1.5 bg-pink-50 hover:bg-pink-100 text-neutral-950 rounded-xl text-xs font-bold border border-pink-200 transition-colors flex items-center gap-1.5 cursor-pointer"
+                      title="Copy all subscriber emails separated by comma"
+                    >
+                      <Copy className="w-3.5 h-3.5 text-pink-600" />
+                      <span>Copy All Emails</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!subscribers || subscribers.length === 0) {
+                          showToast('⚠️ No subscribers found to export!');
+                          return;
+                        }
+                        const headers = ['Email Address', 'Date Subscribed', 'Lead Source'];
+                        const rows = subscribers.map((s) => [`"${s.email}"`, `"${s.date || ''}"`, `"${s.source || 'Storefront Footer'}"`]);
+                        const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+                        const encodedUri = encodeURI(csvContent);
+                        const link = document.createElement('a');
+                        link.setAttribute('href', encodedUri);
+                        link.setAttribute('download', `Stylish_Shoes_Subscribers_${new Date().toISOString().slice(0, 10)}.csv`);
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        showToast('📥 Subscribers CSV exported successfully!');
+                      }}
+                      className="px-3 py-1.5 bg-neutral-950 hover:bg-pink-600 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>Export CSV</span>
+                    </button>
+                  </div>
+                </div>
+
+                {subscribers && subscribers.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse text-xs">
+                      <thead>
+                        <tr className="border-b border-pink-100 text-[11px] font-black text-gray-500 uppercase tracking-wider bg-pink-50/40">
+                          <th className="py-2.5 px-3">#</th>
+                          <th className="py-2.5 px-3">Subscriber Email</th>
+                          <th className="py-2.5 px-3">Date Joined</th>
+                          <th className="py-2.5 px-3">Status</th>
+                          <th className="py-2.5 px-3 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-pink-100/60">
+                        {subscribers.map((sub, idx) => (
+                          <tr key={sub.id || idx} className="hover:bg-pink-50/30 transition-colors">
+                            <td className="py-2.5 px-3 font-mono text-gray-400 font-bold">{idx + 1}</td>
+                            <td className="py-2.5 px-3">
+                              <div className="flex items-center gap-2 font-bold text-neutral-950">
+                                <Mail className="w-3.5 h-3.5 text-pink-500" />
+                                <span>{sub.email}</span>
+                              </div>
+                            </td>
+                            <td className="py-2.5 px-3 text-gray-500">{sub.date || 'Recent'}</td>
+                            <td className="py-2.5 px-3">
+                              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 uppercase">
+                                Subscribed
+                              </span>
+                            </td>
+                            <td className="py-2.5 px-3 text-right">
+                              <button
+                                type="button"
+                                onClick={() => deleteSubscriber(sub.id || sub.email)}
+                                className="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                                title="Remove subscriber"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="text-center py-6 text-gray-400 space-y-1">
+                    <Mail className="w-8 h-8 mx-auto text-gray-300" />
+                    <p className="text-xs font-semibold">No subscribers recorded yet.</p>
+                  </div>
+                )}
               </div>
 
             </div>

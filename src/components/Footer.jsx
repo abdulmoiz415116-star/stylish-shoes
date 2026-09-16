@@ -64,15 +64,19 @@ export const Footer = () => {
     setIsSizeGuideOpen,
     setIsCustomerAccountOpen,
     openAdminPanel,
-    isAdminAuthenticated
+    isAdminAuthenticated,
+    addSubscriber
   } = useShop();
 
   const handleSubscribe = (e) => {
     e.preventDefault();
     if (emailInput.trim() !== '') {
+      if (typeof addSubscriber === 'function') {
+        addSubscriber(emailInput);
+      }
       setSubscribed(true);
       setEmailInput('');
-      setTimeout(() => setSubscribed(false), 5000);
+      setTimeout(() => setSubscribed(false), 6000);
     }
   };
 
