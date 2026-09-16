@@ -168,8 +168,10 @@ export const ShopProvider = ({ children }) => {
 
   const [reviews, setReviews] = useState(() => {
     try {
+      const deletedIds = JSON.parse(localStorage.getItem('stylish_deleted_review_ids') || '[]');
       const saved = localStorage.getItem('stylish_reviews');
-      return saved ? JSON.parse(saved) : INITIAL_REVIEWS;
+      const baseReviews = saved ? JSON.parse(saved) : INITIAL_REVIEWS;
+      return baseReviews.filter((r) => !deletedIds.includes(r.id));
     } catch {
       return INITIAL_REVIEWS;
     }
@@ -357,7 +359,12 @@ export const ShopProvider = ({ children }) => {
       setOrders(cloudOrders);
     });
     const unsubscribeReviews = listenToReviewsCloud((cloudReviews) => {
-      setReviews(cloudReviews);
+      try {
+        const deletedIds = JSON.parse(localStorage.getItem('stylish_deleted_review_ids') || '[]');
+        setReviews(cloudReviews.filter((r) => !deletedIds.includes(r.id)));
+      } catch {
+        setReviews(cloudReviews);
+      }
     });
 
     return () => {
@@ -781,7 +788,20 @@ export const ShopProvider = ({ children }) => {
   };
 
   const deleteReview = (reviewId) => {
-    setReviews((prev) => prev.filter((r) => r.id !== reviewId));
+    try {
+      const deletedIds = JSON.parse(localStorage.getItem('stylish_deleted_review_ids') || '[]');
+      if (!deletedIds.includes(reviewId)) {
+        deletedIds.push(reviewId);
+        localStorage.setItem('stylish_deleted_review_ids', JSON.stringify(deletedIds));
+      }
+    } catch {}
+
+    setReviews((prev) => {
+      const updated = prev.filter((r) => r.id !== reviewId);
+      localStorage.setItem('stylish_reviews', JSON.stringify(updated));
+      return updated;
+    });
+
     deleteReviewCloud(reviewId);
     showToast('🗑️ Review removed & synced');
   };
