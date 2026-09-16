@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useShop } from '../context/ShopContext';
-import { ShoppingBag, CheckCircle, Truck, CreditCard, Sparkles, Send, Copy, ExternalLink, X, Package, Printer, Download } from 'lucide-react';
+import { ShoppingBag, CheckCircle, Truck, CreditCard, Sparkles, Send, Copy, ExternalLink, X, Package, Printer, Download, Tag, AlertCircle, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const CheckoutModal = () => {
@@ -12,6 +12,9 @@ export const CheckoutModal = () => {
     shippingFee,
     cartTotal,
     discountAmount,
+    appliedPromo,
+    applyPromoCode,
+    removePromoCode,
     clearCart,
     orderReceipt,
     setOrderReceipt,
@@ -20,6 +23,25 @@ export const CheckoutModal = () => {
     customerProfile,
     saveCustomerProfile
   } = useShop();
+
+  const [checkoutPromoInput, setCheckoutPromoInput] = useState('');
+  const [checkoutPromoError, setCheckoutPromoError] = useState('');
+
+  const handleApplyCheckoutPromo = (e) => {
+    if (e) e.preventDefault();
+    const trimmed = checkoutPromoInput.trim();
+    if (!trimmed) {
+      setCheckoutPromoError('⚠️ Please enter a promo code.');
+      return;
+    }
+    const res = applyPromoCode(trimmed);
+    if (!res.success) {
+      setCheckoutPromoError(res.message);
+    } else {
+      setCheckoutPromoError('');
+      setCheckoutPromoInput('');
+    }
+  };
 
   const [formData, setFormData] = useState(() => ({
     fullName: customerProfile?.fullName || '',
@@ -446,12 +468,85 @@ export const CheckoutModal = () => {
                 </div>
               </div>
 
+              {/* Promo Code Input in Checkout */}
+              <div className="space-y-2 bg-neutral-50/80 p-3.5 rounded-2xl border border-neutral-200/80">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black text-neutral-900 uppercase tracking-wider flex items-center gap-1.5">
+                    <Tag className="w-3.5 h-3.5 text-pink-600" />
+                    <span>Have a Promo Code?</span>
+                  </span>
+                  {appliedPromo && (
+                    <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
+                      Active
+                    </span>
+                  )}
+                </div>
+
+                {!appliedPromo ? (
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <input
+                          type="text"
+                          placeholder="Enter Promo Code (e.g. STYLISH10)"
+                          value={checkoutPromoInput}
+                          onChange={(e) => {
+                            setCheckoutPromoInput(e.target.value);
+                            if (checkoutPromoError) setCheckoutPromoError('');
+                          }}
+                          className={`w-full px-3 py-2 text-xs border rounded-xl uppercase font-bold tracking-wider transition-all focus:outline-none ${
+                            checkoutPromoError
+                              ? 'border-red-500 bg-red-50/60 text-red-900 focus:ring-2 focus:ring-red-200'
+                              : 'border-neutral-200 focus:border-pink-600 bg-white'
+                          }`}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleApplyCheckoutPromo}
+                        className="bg-neutral-950 hover:bg-pink-600 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-colors cursor-pointer shadow-xs"
+                      >
+                        Apply
+                      </button>
+                    </div>
+
+                    {/* Inline Error for Fake/Invalid Promo Code */}
+                    {checkoutPromoError && (
+                      <div className="flex items-start gap-2 p-2.5 bg-red-50 border border-red-200 rounded-xl text-[11px] text-red-700 font-bold">
+                        <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+                        <span>{checkoutPromoError}</span>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between text-xs bg-emerald-50 text-emerald-800 p-2.5 rounded-xl border border-emerald-200 font-medium">
+                    <span className="flex items-center gap-1.5 font-bold">
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Code <strong>{appliedPromo}</strong> applied (-Rs. {discountAmount.toLocaleString()})</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={removePromoCode}
+                      className="text-[10px] font-extrabold text-red-600 hover:text-red-800 hover:underline uppercase cursor-pointer"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                )}
+              </div>
+
               {/* Order Summary Box */}
               <div className="bg-pink-50/80 p-4 rounded-xl border border-pink-100 space-y-2">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal:</span>
                   <span>Rs. {cartSubtotal.toLocaleString()}</span>
                 </div>
+                {discountAmount > 0 && (
+                  <div className="flex justify-between text-emerald-600 font-bold">
+                    <span>Discount ({appliedPromo}):</span>
+                    <span>- Rs. {discountAmount.toLocaleString()}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping Fee:</span>
                   <span>{shippingFee === 0 ? 'FREE' : `Rs. ${shippingFee}`}</span>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useShop } from '../context/ShopContext';
-import { X, Trash2, ShoppingBag, ArrowRight, Truck, Tag, Check } from 'lucide-react';
+import { X, Trash2, ShoppingBag, ArrowRight, Truck, Tag, Check, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const CartDrawer = () => {
@@ -28,9 +28,13 @@ export const CartDrawer = () => {
   if (!isCartOpen) return null;
 
   const handleApplyPromo = (e) => {
-    e.preventDefault();
-    if (!promoInput) return;
-    const res = applyPromoCode(promoInput);
+    if (e) e.preventDefault();
+    const trimmed = promoInput.trim();
+    if (!trimmed) {
+      setPromoError('⚠️ Please enter a promo code first.');
+      return;
+    }
+    const res = applyPromoCode(trimmed);
     if (!res.success) {
       setPromoError(res.message);
     } else {
@@ -192,37 +196,61 @@ export const CartDrawer = () => {
             {cart.length > 0 && (
               <div className="p-4 sm:p-6 border-t border-gray-200 bg-white space-y-4">
                 {/* Promo Code Input */}
-                <form onSubmit={handleApplyPromo} className="flex gap-2">
-                  <div className="relative flex-1">
-                    <Tag className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="text"
-                      placeholder="Promo Code (e.g. CLIVE10)"
-                      value={promoInput}
-                      onChange={(e) => setPromoInput(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2 text-xs border border-gray-200 rounded uppercase font-semibold focus:outline-none focus:border-clive-gold"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="bg-gray-900 hover:bg-clive-gold text-white px-4 py-2 rounded text-xs font-bold uppercase tracking-wider transition-colors"
-                  >
-                    Apply
-                  </button>
-                </form>
-
-                {promoError && <p className="text-[11px] text-red-500 font-medium">{promoError}</p>}
-                {appliedPromo && (
-                  <div className="flex items-center justify-between text-xs bg-emerald-50 text-emerald-800 p-2 rounded border border-emerald-200">
-                    <span>Promo Applied: <strong>{appliedPromo}</strong></span>
+                <div className="space-y-2">
+                  <form onSubmit={handleApplyPromo} className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Tag className={`w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 transition-colors ${promoError ? 'text-red-500' : 'text-gray-400'}`} />
+                      <input
+                        type="text"
+                        placeholder="Promo Code (e.g. STYLISH10)"
+                        value={promoInput}
+                        onChange={(e) => {
+                          setPromoInput(e.target.value);
+                          if (promoError) setPromoError('');
+                        }}
+                        className={`w-full pl-9 pr-3 py-2 text-xs border rounded-xl uppercase font-bold tracking-wider transition-all focus:outline-none ${
+                          promoError
+                            ? 'border-red-500 bg-red-50/60 text-red-900 focus:ring-2 focus:ring-red-200'
+                            : 'border-gray-200 focus:border-pink-600 focus:ring-2 focus:ring-pink-100'
+                        }`}
+                      />
+                    </div>
                     <button
-                      onClick={removePromoCode}
-                      className="text-[10px] font-bold text-emerald-900 hover:underline uppercase"
+                      type="submit"
+                      className="bg-neutral-950 hover:bg-pink-600 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-colors cursor-pointer shadow-xs"
                     >
-                      Remove
+                      Apply
                     </button>
-                  </div>
-                )}
+                  </form>
+
+                  {/* Inline Error for Fake/Invalid Promo Codes */}
+                  {promoError && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex items-start gap-2 p-2.5 bg-red-50 border border-red-200 rounded-xl text-[11px] text-red-700 font-bold"
+                    >
+                      <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+                      <span>{promoError}</span>
+                    </motion.div>
+                  )}
+
+                  {appliedPromo && (
+                    <div className="flex items-center justify-between text-xs bg-emerald-50 text-emerald-800 p-2.5 rounded-xl border border-emerald-200 font-medium">
+                      <span className="flex items-center gap-1.5 font-bold">
+                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Promo Applied: <strong className="text-emerald-950 font-black">{appliedPromo}</strong></span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={removePromoCode}
+                        className="text-[10px] font-extrabold text-red-600 hover:text-red-800 hover:underline uppercase cursor-pointer"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  )}
+                </div>
 
                 {/* Subtotal calculations */}
                 <div className="space-y-1.5 text-xs text-gray-600 pt-2 border-t border-gray-100">

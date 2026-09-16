@@ -787,12 +787,90 @@ export const ShopProvider = ({ children }) => {
   };
 
 
+  const freeShippingThreshold = 4000;
+
+  // Promo Code Validation & Application
+  const applyPromoCode = (code) => {
+    const cleanCode = (code || '').trim().toUpperCase();
+    if (!cleanCode) {
+      return { success: false, message: '⚠️ Please enter a promo code.' };
+    }
+
+    // Load coupons from admin panel or fallback to initial store promotions
+    let availableCoupons = [
+      { id: 'c-1', code: 'STYLISH10', type: 'percentage', value: 10, minOrder: 0, active: true },
+      { id: 'c-2', code: 'WELCOME500', type: 'fixed', value: 500, minOrder: 2000, active: true },
+      { id: 'c-3', code: 'FREESHIP', type: 'free_shipping', value: 250, minOrder: 0, active: true },
+      { id: 'c-4', code: 'CLIVE10', type: 'percentage', value: 10, minOrder: 0, active: true },
+      { id: 'c-5', code: 'WELCOME', type: 'percentage', value: 5, minOrder: 0, active: true },
+    ];
+
+    try {
+      const saved = localStorage.getItem('stylish_admin_coupons');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          availableCoupons = parsed;
+        }
+      }
+    } catch {}
+
+    const match = availableCoupons.find(
+      (c) => (c.code || '').trim().toUpperCase() === cleanCode
+    );
+
+    // FAKE OR INVALID PROMO CODE:
+    // DO NOT trigger positive notification on screen!
+    if (!match) {
+      return {
+        success: false,
+        message: `❌ "${cleanCode}" is an invalid or fake promo code!`
+      };
+    }
+
+    if (match.active === false) {
+      return {
+        success: false,
+        message: `⚠️ Promo code "${match.code}" has expired or is currently inactive.`
+      };
+    }
+
+    // Minimum order requirement check
+    const currentSubtotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+    if (match.minOrder && currentSubtotal < Number(match.minOrder)) {
+      return {
+        success: false,
+        message: `⚠️ Minimum order of Rs. ${Number(match.minOrder).toLocaleString()} required for code "${match.code}".`
+      };
+    }
+
+    // Apply Discount
+    if (match.type === 'percentage') {
+      setDiscountRate(Number(match.value) / 100);
+    } else if (match.type === 'fixed') {
+      const rate = currentSubtotal > 0 ? Number(match.value) / currentSubtotal : 0;
+      setDiscountRate(rate);
+    } else if (match.type === 'free_shipping') {
+      setDiscountRate(0);
+    }
+
+    setAppliedPromo(match.code);
+    showToast(`🎉 Promo code "${match.code}" applied successfully!`);
+    return { success: true, message: `Promo code "${match.code}" applied!` };
+  };
+
+  const removePromoCode = () => {
+    setAppliedPromo('');
+    setDiscountRate(0);
+    showToast('Promo code removed');
+  };
+
   // Calculations
   const cartSubtotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
   const discountAmount = cartSubtotal * discountRate;
-  const shippingFee = cartSubtotal >= 4000 || cartSubtotal === 0 ? 0 : 250;
-  const cartTotal = cartSubtotal - discountAmount + shippingFee;
-  const amountForFreeShipping = Math.max(0, 4000 - cartSubtotal);
+  const shippingFee = cartSubtotal >= freeShippingThreshold || cartSubtotal === 0 ? 0 : 250;
+  const cartTotal = Math.max(0, cartSubtotal - discountAmount + shippingFee);
+  const amountForFreeShipping = Math.max(0, freeShippingThreshold - cartSubtotal);
 
   return (
     <ShopContext.Provider
@@ -846,6 +924,9 @@ export const ShopProvider = ({ children }) => {
         lockAdminSession,
         openAdminPanel,
         appliedPromo,
+        applyPromoCode,
+        removePromoCode,
+        freeShippingThreshold,
         discountRate,
         discountAmount,
         cartSubtotal,
