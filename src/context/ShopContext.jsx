@@ -560,13 +560,33 @@ export const ShopProvider = ({ children }) => {
 
   // Cart Operations
   const addToCart = (product, selectedColor = null, selectedSize = null, qty = 1) => {
-    if (!product.inStock || product.stockCount <= 0) {
-      showToast(`⚠️ Sorry, "${product.title}" is currently Out of Stock!`);
+    // Find current live product in products array to get freshest stock
+    const currentProd = products.find((p) => p.id === product.id) || product;
+    const availableStock = currentProd.stockCount !== undefined ? currentProd.stockCount : 15;
+
+    if (!currentProd.inStock || availableStock <= 0) {
+      showToast(`⚠️ Sorry, "${currentProd.title}" is completely Out of Stock!`);
       return;
     }
 
     const color = selectedColor || (product.colors && product.colors[0]) || 'Standard';
     const size = selectedSize || (product.sizes && product.sizes[0]) || 'Standard';
+
+    // Check quantity already in cart for this product
+    const existingInCart = cart.find(
+      (item) => item.product.id === product.id && item.selectedColor === color && item.selectedSize === size
+    );
+    const existingQty = existingInCart ? existingInCart.quantity : 0;
+
+    if (existingQty + qty > availableStock) {
+      const allowedToAdd = availableStock - existingQty;
+      if (allowedToAdd <= 0) {
+        showToast(`❌ Only ${availableStock} pair(s) left in stock! You already have all in your bag.`);
+      } else {
+        showToast(`❌ Only ${availableStock} pair(s) in stock! You can only add ${allowedToAdd} more.`);
+      }
+      return;
+    }
 
     setCart((prevCart) => {
       const existingIndex = prevCart.findIndex(
@@ -578,18 +598,25 @@ export const ShopProvider = ({ children }) => {
         updated[existingIndex].quantity += qty;
         return updated;
       } else {
-        return [...prevCart, { product, selectedColor: color, selectedSize: size, quantity: qty }];
+        return [...prevCart, { product: currentProd, selectedColor: color, selectedSize: size, quantity: qty }];
       }
     });
 
-    showToast(`Added "${product.title}" to Cart`);
+    showToast(`Added "${product.title}" (${qty} pair) to Cart`);
   };
 
   const updateCartQuantity = (productId, color, size, delta) => {
+    const currentProd = products.find((p) => p.id === productId);
+    const availableStock = currentProd ? (currentProd.stockCount !== undefined ? currentProd.stockCount : 15) : 99;
+
     setCart((prevCart) => {
       return prevCart.map((item) => {
         if (item.product.id === productId && item.selectedColor === color && item.selectedSize === size) {
           const newQty = item.quantity + delta;
+          if (newQty > availableStock) {
+            showToast(`❌ Only ${availableStock} in stock for "${item.product.title}"!`);
+            return item;
+          }
           return newQty > 0 ? { ...item, quantity: newQty } : null;
         }
         return item;
@@ -661,9 +688,11 @@ export const ShopProvider = ({ children }) => {
     setProducts((prev) => [p, ...prev]);
     saveProductCloud(p);
 
-    setSelectedCategory('all');
-    setSelectedSubcategory(null);
-    setSearchQuery('');
+    // Keep admin session safely locked in Admin Mode
+    setIsAdminMode(true);
+    if (!window.location.hash.includes('admin')) {
+      window.location.hash = 'admin';
+    }
 
     showToast(`✨ Product "${p.title}" created & LIVE on Firebase Cloud!`);
   };

@@ -232,27 +232,76 @@ export const QuickViewModal = () => {
                   </div>
                 )}
 
-                {/* Quantity Control */}
-                <div className="mt-5 flex items-center gap-4">
-                  <label className="text-xs font-bold text-gray-800 uppercase tracking-wider">
-                    Quantity:
-                  </label>
-                  <div className="flex items-center border border-gray-300 rounded overflow-hidden">
-                    <button
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="px-3 py-1 bg-gray-100 text-gray-700 hover:bg-gray-200 font-bold"
-                    >
-                      -
-                    </button>
-                    <span className="px-4 py-1 text-xs font-bold text-gray-900">{quantity}</span>
-                    <button
-                      onClick={() => setQuantity(quantity + 1)}
-                      className="px-3 py-1 bg-gray-100 text-gray-700 hover:bg-gray-200 font-bold"
-                    >
-                      +
-                    </button>
-                  </div>
+                {/* Stock Status Alert */}
+                <div className="mt-4">
+                  {(() => {
+                    const currentStock = quickViewProduct.stockCount !== undefined ? quickViewProduct.stockCount : 15;
+                    const isOutOfStock = !quickViewProduct.inStock || currentStock <= 0;
+                    if (isOutOfStock) {
+                      return (
+                        <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs font-bold text-red-700 flex items-center gap-2">
+                          <span>❌ Currently Completely Sold Out</span>
+                        </div>
+                      );
+                    }
+                    if (currentStock <= 5) {
+                      return (
+                        <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs font-bold text-amber-800 flex items-center justify-between">
+                          <span>⚠️ Only {currentStock} pair(s) remaining in stock!</span>
+                          <span className="text-[10px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full uppercase">Fast Selling</span>
+                        </div>
+                      );
+                    }
+                    return (
+                      <div className="text-[11px] text-emerald-700 font-bold flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        <span>In Stock ({currentStock} units available)</span>
+                      </div>
+                    );
+                  })()}
                 </div>
+
+                {/* Quantity Control */}
+                {(() => {
+                  const currentStock = quickViewProduct.stockCount !== undefined ? quickViewProduct.stockCount : 15;
+                  const isOutOfStock = !quickViewProduct.inStock || currentStock <= 0;
+                  return (
+                    <div className="mt-5 flex items-center gap-4">
+                      <label className="text-xs font-bold text-gray-800 uppercase tracking-wider">
+                        Quantity:
+                      </label>
+                      <div className="flex items-center border border-gray-300 rounded overflow-hidden">
+                        <button
+                          type="button"
+                          onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                          className="px-3 py-1 bg-gray-100 text-gray-700 hover:bg-gray-200 font-bold"
+                        >
+                          -
+                        </button>
+                        <span className="px-4 py-1 text-xs font-bold text-gray-900">{quantity}</span>
+                        <button
+                          type="button"
+                          disabled={isOutOfStock || quantity >= currentStock}
+                          onClick={() => {
+                            if (quantity < currentStock) {
+                              setQuantity(quantity + 1);
+                            } else {
+                              showToast(`❌ Only ${currentStock} pair(s) left in stock!`);
+                            }
+                          }}
+                          className={`px-3 py-1 font-bold ${
+                            isOutOfStock || quantity >= currentStock
+                              ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          +
+                        </button>
+                      </div>
+                      <span className="text-[11px] text-gray-500">Max: {currentStock}</span>
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* Action Buttons */}

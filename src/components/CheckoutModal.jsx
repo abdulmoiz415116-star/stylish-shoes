@@ -8,6 +8,7 @@ export const CheckoutModal = () => {
     isCheckoutOpen,
     setIsCheckoutOpen,
     cart,
+    products,
     cartSubtotal,
     shippingFee,
     cartTotal,
@@ -78,6 +79,20 @@ export const CheckoutModal = () => {
     if (!formData.address.trim() || formData.address.trim().length < 5) {
       if (showToast) showToast('⚠️ Please provide complete delivery address');
       return;
+    }
+
+    // Check every item in cart against current live warehouse stock
+    for (const item of cart) {
+      const liveProd = products.find((p) => p.id === item.product.id) || item.product;
+      const liveStock = liveProd.stockCount !== undefined ? liveProd.stockCount : 15;
+      if (!liveProd.inStock || liveStock <= 0) {
+        if (showToast) showToast(`❌ "${liveProd.title}" is now Out of Stock! Please remove it to proceed.`);
+        return;
+      }
+      if (item.quantity > liveStock) {
+        if (showToast) showToast(`❌ Only ${liveStock} pair(s) available for "${liveProd.title}"! You have ${item.quantity} in order.`);
+        return;
+      }
     }
 
     setIsSubmitting(true);

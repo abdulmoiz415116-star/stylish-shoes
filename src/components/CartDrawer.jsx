@@ -8,6 +8,7 @@ export const CartDrawer = () => {
     isCartOpen,
     setIsCartOpen,
     cart,
+    products,
     updateCartQuantity,
     removeFromCart,
     cartSubtotal,
@@ -148,6 +149,18 @@ export const CartDrawer = () => {
                           {item.selectedColor && <span>Color: <strong>{item.selectedColor}</strong></span>}
                           {item.selectedSize && <span>Size: <strong>{item.selectedSize}</strong></span>}
                         </div>
+                        {(() => {
+                          const liveProd = products.find((p) => p.id === item.product.id) || item.product;
+                          const liveStock = liveProd.stockCount !== undefined ? liveProd.stockCount : 15;
+                          if (liveStock <= 3) {
+                            return (
+                              <span className="text-[10px] text-amber-700 font-bold block mt-1">
+                                ⚠️ Only {liveStock} left in stock!
+                              </span>
+                            );
+                          }
+                          return null;
+                        })()}
                       </div>
 
                       <div className="flex items-center justify-between mt-2">
