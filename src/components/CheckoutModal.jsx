@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useShop } from '../context/ShopContext';
-import { ShoppingBag, CheckCircle, Truck, CreditCard, Sparkles, Send, Copy, ExternalLink, X, Package, Printer } from 'lucide-react';
+import { ShoppingBag, CheckCircle, Truck, CreditCard, Sparkles, Send, Copy, ExternalLink, X, Package, Printer, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const CheckoutModal = () => {

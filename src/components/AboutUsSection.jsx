@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { ShieldCheck, Truck, Award, RefreshCw, Sparkles, Heart, CheckCircle2, Phone, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -104,7 +104,7 @@ export const AboutUsSection = () => {
             </div>
 
             {/* WhatsApp direct line quote */}
-            <div className="bg-black text-white p-4 sm:p-5 rounded-2xl flex items-center justify-between gap-4 shadow-xl border border-neutral-800">
+            <div className="bg-black text-white p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-4 shadow-xl border border-neutral-800">
               <div className="space-y-0.5">
                 <span className="text-[10px] uppercase font-black tracking-widest text-pink-400 block">
                   PERSONAL CONSULTATION
@@ -117,7 +117,7 @@ export const AboutUsSection = () => {
                 href="https://wa.me/923255964412?text=Assalam-o-Alaikum%20Stylish%20Store!%20I%20want%20more%20details%20about%20your%20shoes%20and%20bags."
                 target="_blank"
                 rel="noreferrer"
-                className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shrink-0 flex items-center gap-1.5 shadow-lg shadow-pink-900/40 transition-all active:scale-95"
+                className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shrink-0 flex items-center justify-center gap-1.5 shadow-lg shadow-pink-900/40 transition-all active:scale-95 w-full sm:w-auto"
               >
                 <Phone className="w-3.5 h-3.5" />
                 <span>WhatsApp Us</span>

@@ -10,7 +10,7 @@ export const WhatsAppFloatingButton = () => {
   const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(defaultMessage)}`;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 font-poppins flex flex-col items-end">
+    <div className="fixed bottom-20 md:bottom-6 right-3 sm:right-6 z-40 font-poppins flex flex-col items-end">
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -18,7 +18,7 @@ export const WhatsAppFloatingButton = () => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.88, y: 15 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="mb-4 w-80 bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.25)] border border-emerald-100 overflow-hidden"
+            className="mb-4 w-[calc(100vw-2rem)] max-w-xs sm:max-w-sm sm:w-80 bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.25)] border border-emerald-100 overflow-hidden"
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-emerald-600 to-green-600 text-white p-4 flex items-center justify-between shadow-sm">

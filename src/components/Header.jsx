@@ -164,7 +164,7 @@ export const Header = () => {
               <span className="text-pink-500">&bull;</span>
               <span className="text-amber-300 font-bold">Free Delivery on Orders Above Rs. 4,000</span>
               <span className="text-pink-500">&bull;</span>
-              <span className="text-emerald-400 font-bold">Cash On Delivery &amp; JazzCash Available</span>
+              <span className="text-emerald-400 font-bold">100% Cash On Delivery (COD) Available Nationwide</span>
               <span className="text-pink-500">&bull;</span>
               <span className="text-pink-300 font-bold">7 Days Easy Size Exchange</span>
               <span className="text-pink-500">&bull;</span>
@@ -207,20 +207,20 @@ export const Header = () => {
           {/* Official Brand Logo & Name */}
           <a
             href="/"
-            className="flex-shrink-0 flex items-center cursor-pointer gap-3 group select-none no-underline"
+            className="flex-shrink-0 flex items-center cursor-pointer gap-2 sm:gap-3 group select-none no-underline"
             onClick={handleGoHome}
             title="Return to Home Page"
           >
             <img
               src="/logo.png"
               alt="Stylish Shoes & Bags Logo"
-              className="h-14 w-auto object-contain rounded-full shadow-md border-2 border-pink-200 group-hover:scale-105 transition-transform"
+              className="h-10 sm:h-14 w-auto object-contain rounded-full shadow-md border-2 border-pink-200 group-hover:scale-105 transition-transform"
             />
             <div className="flex flex-col text-left">
-              <span className="text-xl sm:text-2xl font-extrabold tracking-tight text-neutral-950 font-poppins uppercase leading-none group-hover:text-pink-600 transition-colors">
+              <span className="text-lg sm:text-2xl font-extrabold tracking-tight text-neutral-950 font-poppins uppercase leading-none group-hover:text-pink-600 transition-colors">
                 STYLISH <span className="text-pink-600">SHOES</span>
               </span>
-              <span className="text-[10px] tracking-[0.25em] font-bold text-black uppercase mt-0.5">
+              <span className="text-[9px] sm:text-[10px] tracking-[0.15em] sm:tracking-[0.25em] font-bold text-black uppercase mt-0.5 hidden xs:block">
                 AND BAGS &bull; STEP INTO STYLE
               </span>
             </div>
@@ -302,27 +302,27 @@ export const Header = () => {
           </nav>
 
           {/* Right Action Icons */}
-          <div className="flex items-center space-x-2 sm:space-x-3">
+          <div className="flex items-center space-x-1.5 sm:space-x-3">
             {/* Real-time Search Box & Dropdown */}
             <div ref={searchContainerRef} className="relative">
               <form onSubmit={handleSearchSubmit} className="relative">
                 <input
                   type="text"
-                  placeholder="Search shoes, bags..."
+                  placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
                     setSearchFocused(true);
                   }}
                   onFocus={() => setSearchFocused(true)}
-                  className="w-32 sm:w-48 md:w-56 pl-8 pr-7 py-1.5 text-xs bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-full focus:bg-white focus:border-pink-500 focus:outline-none focus:ring-1 focus:ring-pink-500 transition-all font-medium text-gray-900 placeholder-gray-400"
+                  className="w-24 xs:w-36 sm:w-48 md:w-56 pl-7 sm:pl-8 pr-6 sm:pr-7 py-1.5 text-xs bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-full focus:bg-white focus:border-pink-500 focus:outline-none focus:ring-1 focus:ring-pink-500 transition-all font-medium text-gray-900 placeholder-gray-400"
                 />
-                <Search className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                <Search className="w-3.5 h-3.5 text-gray-400 absolute left-2 sm:left-2.5 top-1/2 -translate-y-1/2" />
                 {searchQuery && (
                   <button
                     type="button"
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 font-bold text-xs cursor-pointer"
+                    className="absolute right-2 sm:right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 font-bold text-xs cursor-pointer"
                   >
                     ✕
                   </button>
@@ -336,7 +336,7 @@ export const Header = () => {
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 p-2 font-poppins"
+                    className="absolute right-0 top-full mt-2 w-[calc(100vw-2rem)] max-w-sm sm:w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 p-2 font-poppins"
                   >
                     <div className="px-3 py-2 text-[10px] font-extrabold text-neutral-950 uppercase tracking-widest bg-pink-50 rounded-xl flex items-center justify-between border border-pink-100">
                       <span>Live Results ({searchResults.length})</span>
@@ -397,17 +397,17 @@ export const Header = () => {
             {/* Discreet Management Portal Trigger (Small icon only, no giveaway text) */}
             <button
               onClick={() => openAdminPanel(true)}
-              className="p-2 text-gray-500 hover:text-neutral-950 hover:bg-pink-50 rounded-full transition-all cursor-pointer"
+              className="p-1.5 sm:p-2 text-gray-500 hover:text-neutral-950 hover:bg-pink-50 rounded-full transition-all cursor-pointer"
               title="Secure Access"
               aria-label="Secure Access"
             >
               <Lock className="w-4 h-4" />
             </button>
 
-            {/* Wishlist */}
+            {/* Wishlist (Shown on desktop/tablet, mobile uses MobileBottomNav) */}
             <button
               onClick={() => handleCategorySelect('all')}
-              className="relative p-2 text-gray-700 hover:text-pink-600 transition-colors cursor-pointer"
+              className="hidden sm:flex relative p-2 text-gray-700 hover:text-pink-600 transition-colors cursor-pointer"
               title="Wishlist"
             >
               <Heart className="w-5 h-5" />
@@ -421,7 +421,7 @@ export const Header = () => {
             {/* Cart Button */}
             <button
               onClick={() => setIsCartOpen(true)}
-              className="relative p-2 text-gray-700 hover:text-pink-600 transition-colors flex items-center gap-1 cursor-pointer"
+              className="relative p-1.5 sm:p-2 text-gray-700 hover:text-pink-600 transition-colors flex items-center gap-1 cursor-pointer"
               title="View Cart"
             >
               <div className="relative">

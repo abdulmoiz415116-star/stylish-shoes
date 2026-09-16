@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useShop } from '../context/ShopContext';
 import { Star, CheckCircle, Quote, PlusCircle, X, Send, ThumbsUp, ShieldCheck, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -95,7 +95,7 @@ export const CustomerReviewsSection = () => {
 
           <button
             onClick={() => setIsModalOpen(true)}
-            className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white px-6 py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider transition-all shadow-xl shadow-pink-900/30 flex items-center gap-2 shrink-0 cursor-pointer active:scale-95"
+            className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white px-6 py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider transition-all shadow-xl shadow-pink-900/30 flex items-center justify-center gap-2 shrink-0 cursor-pointer active:scale-95 w-full sm:w-auto"
           >
             <PlusCircle className="w-4 h-4" />
             <span>WRITE A REVIEW &amp; RATING</span>

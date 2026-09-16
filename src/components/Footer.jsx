@@ -667,7 +667,7 @@ export const Footer = () => {
             &copy; {new Date().getFullYear()} <strong className="text-neutral-950 font-bold">STYLISH SHOES &amp; BAGS</strong>. All rights reserved. Step Into Style.
           </p>
 
-          <div className="flex items-center gap-4 text-neutral-700 font-semibold">
+          <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2.5 sm:gap-4 text-neutral-700 font-semibold">
             <button
               onClick={() => setActivePolicyModal('privacy')}
               className="hover:text-black transition-colors"

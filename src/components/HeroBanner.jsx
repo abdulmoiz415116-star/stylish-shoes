@@ -67,10 +67,10 @@ export const HeroBanner = () => {
                 </p>
 
                 {/* Action Buttons (Pink & Hover Black) */}
-                <div className="pt-2 flex flex-wrap items-center gap-3.5">
+                <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                   <button
                     onClick={() => handleCtaClick(slide.category)}
-                    className="group inline-flex items-center gap-3 bg-pink-600 hover:bg-black text-white px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-pink-600/25 transition-all duration-300 hover:scale-105 cursor-pointer"
+                    className="group inline-flex items-center justify-center gap-3 bg-pink-600 hover:bg-black text-white px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-pink-600/25 transition-all duration-300 hover:scale-105 cursor-pointer w-full sm:w-auto"
                   >
                     <span>{slide.ctaPrimary}</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
@@ -78,7 +78,7 @@ export const HeroBanner = () => {
 
                   <button
                     onClick={() => handleCtaClick(slide.category === 'women' ? 'men' : 'women')}
-                    className="inline-flex items-center gap-2 bg-white hover:bg-pink-50 text-neutral-950 hover:text-pink-600 px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-wider border-2 border-pink-200 hover:border-pink-500 transition-all duration-200 shadow-xs cursor-pointer"
+                    className="inline-flex items-center justify-center gap-2 bg-white hover:bg-pink-50 text-neutral-950 hover:text-pink-600 px-5 sm:px-6 py-3.5 sm:py-4 rounded-2xl text-xs font-black uppercase tracking-wider border-2 border-pink-200 hover:border-pink-500 transition-all duration-200 shadow-xs cursor-pointer w-full sm:w-auto"
                   >
                     <ShoppingBag className="w-4 h-4 text-pink-600" />
                     <span>{slide.ctaSecondary}</span>
@@ -86,7 +86,7 @@ export const HeroBanner = () => {
                 </div>
 
                 {/* Trust Badges */}
-                <div className="pt-3 flex flex-wrap items-center gap-4 text-xs font-semibold text-neutral-600">
+                <div className="pt-3 flex flex-wrap items-center gap-3 sm:gap-4 text-xs font-semibold text-neutral-600">
                   <div className="flex items-center gap-1.5 text-amber-500">
                     <Star className="w-4 h-4 fill-amber-400 stroke-none" />
                     <span className="font-extrabold text-neutral-900">4.9 / 5.0</span>
@@ -95,7 +95,7 @@ export const HeroBanner = () => {
                   <span className="text-neutral-300 hidden sm:inline">&bull;</span>
                   <div className="flex items-center gap-1.5 text-neutral-800">
                     <Truck className="w-4 h-4 text-pink-600" />
-                    <span>Free Nationwide Express Delivery Available</span>
+                    <span>Free Express Delivery Above Rs. 4,000</span>
                   </div>
                 </div>
               </motion.div>
@@ -106,12 +106,12 @@ export const HeroBanner = () => {
               <span className="text-[10px] font-black uppercase tracking-widest text-neutral-400 block mb-2.5">
                 SELECT LOOKBOOK:
               </span>
-              <div className="flex gap-3">
+              <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-none max-w-full">
                 {HERO_SLIDES.map((s, idx) => (
                   <button
                     key={s.id}
                     onClick={() => setCurrentSlide(idx)}
-                    className={`flex items-center gap-2 p-1.5 pr-3 rounded-2xl border-2 transition-all cursor-pointer ${
+                    className={`flex-shrink-0 min-w-[130px] sm:min-w-0 flex items-center gap-2 p-1.5 pr-3 rounded-2xl border-2 transition-all cursor-pointer ${
                       currentSlide === idx
                         ? 'border-pink-600 bg-pink-50/40 shadow-sm scale-105'
                         : 'border-neutral-200 bg-white hover:bg-neutral-50 opacity-75'
@@ -156,40 +156,40 @@ export const HeroBanner = () => {
                   />
 
                   {/* Top Luxury Tag */}
-                  <div className="absolute top-4 left-4 z-10 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-full text-[11px] font-black text-neutral-900 uppercase tracking-wider shadow-md border border-neutral-200 flex items-center gap-1.5">
+                  <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-10 bg-white/95 backdrop-blur-md px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-[11px] font-black text-neutral-900 uppercase tracking-wider shadow-md border border-neutral-200 flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                     <span>{slide.highlightTag}</span>
                   </div>
 
                   {/* Clean Minimalist Corner Price Badge (No Heavy Overlay) */}
-                  <div className="absolute right-4 bottom-4 z-10 bg-white/95 backdrop-blur-md px-4 py-2 rounded-2xl text-neutral-900 shadow-xl border border-neutral-200 flex items-center gap-3">
-                    <div>
-                      <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider block">
+                  <div className="absolute left-3 bottom-3 sm:left-auto sm:right-4 sm:bottom-4 z-10 bg-white/95 backdrop-blur-md px-3 sm:px-4 py-1.5 sm:py-2 rounded-2xl text-neutral-900 shadow-xl border border-neutral-200 flex items-center gap-2 sm:gap-3 max-w-[70%] sm:max-w-none">
+                    <div className="truncate">
+                      <span className="text-[9px] sm:text-[10px] text-neutral-400 font-bold uppercase tracking-wider block truncate">
                         AUTHENTIC COLLECTION
                       </span>
-                      <h4 className="text-xs font-black text-neutral-900">{slide.productTitle}</h4>
+                      <h4 className="text-[11px] sm:text-xs font-black text-neutral-900 truncate">{slide.productTitle}</h4>
                     </div>
-                    <span className="text-xs font-black text-neutral-900 bg-neutral-100 px-3 py-1.5 rounded-xl border border-neutral-200">
+                    <span className="text-[11px] sm:text-xs font-black text-neutral-900 bg-neutral-100 px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl border border-neutral-200 shrink-0">
                       {slide.price}
                     </span>
                   </div>
                 </div>
 
                 {/* Prev / Next Slide Floating Navigation */}
-                <div className="absolute -bottom-5 right-6 flex items-center gap-2 z-20">
+                <div className="absolute -bottom-4 right-3 sm:-bottom-5 sm:right-6 flex items-center gap-1.5 sm:gap-2 z-20">
                   <button
                     onClick={() => setCurrentSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)}
-                    className="p-3 rounded-2xl bg-white hover:bg-neutral-900 text-neutral-800 hover:text-white shadow-xl border border-neutral-200 transition-all hover:scale-110"
+                    className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-white hover:bg-neutral-900 text-neutral-800 hover:text-white shadow-xl border border-neutral-200 transition-all hover:scale-110 cursor-pointer"
                     aria-label="Previous Slide"
                   >
-                    <ChevronLeft className="w-5 h-5" />
+                    <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                   <button
                     onClick={() => setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length)}
-                    className="p-3 rounded-2xl bg-white hover:bg-neutral-900 text-neutral-800 hover:text-white shadow-xl border border-neutral-200 transition-all hover:scale-110"
+                    className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-white hover:bg-neutral-900 text-neutral-800 hover:text-white shadow-xl border border-neutral-200 transition-all hover:scale-110 cursor-pointer"
                     aria-label="Next Slide"
                   >
-                    <ChevronRight className="w-5 h-5" />
+                    <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                 </div>
               </motion.div>
