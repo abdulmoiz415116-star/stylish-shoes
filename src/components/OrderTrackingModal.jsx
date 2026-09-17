@@ -70,7 +70,7 @@ export const OrderTrackingModal = () => {
                 type="text"
                 value={inputQuery}
                 onChange={(e) => setInputQuery(e.target.value)}
-                placeholder="Enter Order ID (e.g. STYL-849201) or Phone #"
+                placeholder="Enter Order ID (e.g. STYL-100200) or Phone #"
                 className="w-full bg-gray-50 border border-gray-200 pl-11 pr-4 py-3 rounded-xl text-sm font-semibold text-gray-900 focus:bg-white focus:border-pink-600 focus:outline-none"
               />
             </div>

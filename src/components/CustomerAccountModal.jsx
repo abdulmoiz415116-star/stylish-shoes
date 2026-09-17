@@ -60,18 +60,24 @@ export const CustomerAccountModal = () => {
     }
   }, [orders, isCustomerAccountOpen]);
 
-  // Filter orders matching customer's phone or device placed order IDs
+  // Filter orders matching customer's device placed order IDs or saved phone number
   const customerOrders = useMemo(() => {
     return orders.filter((o) => {
+      // Exclude legacy mock sample orders
+      if (o.orderId === 'STYL-849201' || o.orderId === 'STYL-739102') return false;
+
+      // 1. Matched by device placed order ID
       if (o.orderId && localOrderIds.includes(o.orderId)) return true;
-      if (profileForm.phone) {
+
+      // 2. Matched by saved profile phone number (minimum 7 digits match)
+      if (profileForm.phone && profileForm.phone.trim().length >= 7) {
         const cleanP = profileForm.phone.replace(/[^0-9]/g, '');
         const orderP = (o.customer?.phone || '').replace(/[^0-9]/g, '');
-        if (cleanP && orderP && (cleanP.includes(orderP) || orderP.includes(cleanP))) {
+        if (cleanP && orderP && (cleanP.slice(-7) === orderP.slice(-7))) {
           return true;
         }
       }
-      if (!profileForm.phone && localOrderIds.length === 0) return true;
+
       return false;
     });
   }, [orders, localOrderIds, profileForm.phone]);
@@ -219,9 +225,26 @@ export const CustomerAccountModal = () => {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-10 text-gray-500 space-y-2">
-                  <Package className="w-10 h-10 mx-auto text-gray-400" />
-                  <p className="text-xs font-semibold">No past orders found on this device.</p>
+                <div className="text-center py-12 px-4 bg-pink-50/40 rounded-3xl border border-pink-100/80 space-y-3">
+                  <div className="w-14 h-14 bg-white rounded-2xl mx-auto flex items-center justify-center shadow-sm text-pink-500 border border-pink-100">
+                    <Package className="w-7 h-7" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-black text-neutral-900">No Past Orders Found</h4>
+                    <p className="text-xs text-gray-500 mt-1 max-w-sm mx-auto">
+                      You haven't placed any orders on this device yet. Once you place an order, it will appear here automatically with live tracking &amp; official receipt!
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setIsCustomerAccountOpen(false);
+                      window.scrollTo({ top: 400, behavior: 'smooth' });
+                    }}
+                    className="inline-flex items-center gap-2 bg-neutral-950 hover:bg-pink-600 text-white text-xs font-black uppercase tracking-wider px-5 py-2.5 rounded-xl transition-all shadow-md mt-1 cursor-pointer"
+                  >
+                    <ShoppingBag className="w-4 h-4" />
+                    <span>Explore Products</span>
+                  </button>
                 </div>
               )}
             </div>

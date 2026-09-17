@@ -134,33 +134,19 @@ export const ShopProvider = ({ children }) => {
     }
   });
 
-  const INITIAL_ORDERS = [
-    {
-      orderId: 'STYL-849201',
-      date: '24 Aug 2026',
-      customer: { fullName: 'Tariq Mehmood', phone: '0300-9876543', address: 'Gulberg III, Block B', city: 'Lahore' },
-      items: [{ product: INITIAL_PRODUCTS[0], selectedColor: 'Mustard Tan', selectedSize: '42', quantity: 1 }],
-      paymentMethod: 'cod',
-      jazzcashTid: '',
-      total: 5990,
-      status: 'Pending'
-    },
-    {
-      orderId: 'STYL-739102',
-      date: '23 Aug 2026',
-      customer: { fullName: 'Ayesha Khan', phone: '0321-4567890', address: 'DHA Phase 5', city: 'Karachi' },
-      items: [{ product: INITIAL_PRODUCTS[3], selectedColor: 'Gold', selectedSize: '38', quantity: 1 }],
-      paymentMethod: 'jazzcash',
-      jazzcashTid: 'JC-8829103948',
-      total: 7990,
-      status: 'Dispatched'
-    }
-  ];
+  const INITIAL_ORDERS = [];
 
   const [orders, setOrders] = useState(() => {
     try {
       const saved = localStorage.getItem('stylish_orders');
-      return saved ? JSON.parse(saved) : INITIAL_ORDERS;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Exclude legacy mock sample orders
+        const cleaned = parsed.filter((o) => o.orderId !== 'STYL-849201' && o.orderId !== 'STYL-739102');
+        localStorage.setItem('stylish_orders', JSON.stringify(cleaned));
+        return cleaned;
+      }
+      return INITIAL_ORDERS;
     } catch {
       return INITIAL_ORDERS;
     }
