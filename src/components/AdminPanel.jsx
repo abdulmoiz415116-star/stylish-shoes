@@ -3,6 +3,7 @@ import { useShop } from '../context/ShopContext';
 import { CATEGORIES } from '../data/products';
 import { isFirebaseConfigured } from '../services/firebaseService';
 import { AdminReportsView } from './AdminReportsView';
+import { BulkProductImportModal } from './BulkProductImportModal';
 import {
   LayoutDashboard,
   Package,
@@ -58,6 +59,7 @@ export const AdminPanel = () => {
     orders,
     reviews,
     addNewProduct,
+    addBulkProducts,
     updateProduct,
     updateProductStock,
     deleteProduct,
@@ -107,6 +109,7 @@ export const AdminPanel = () => {
 
   // Modals
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showBulkAddModal, setShowBulkAddModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [selectedOrderModal, setSelectedOrderModal] = useState(null);
   const [imageInputType, setImageInputType] = useState('file'); // 'file' or 'url'
@@ -959,13 +962,23 @@ export const AdminPanel = () => {
             </button>
 
             {activeTab === 'products' && (
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="bg-gradient-to-r from-black to-pink-600 hover:from-neutral-900 hover:to-pink-700 text-white px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Add Product</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowBulkAddModal(true)}
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
+                  title="Bulk Import Multiple Products"
+                >
+                  <Layers className="w-4 h-4" />
+                  <span>Bulk Import (بلک ایڈ)</span>
+                </button>
+                <button
+                  onClick={() => setShowAddModal(true)}
+                  className="bg-gradient-to-r from-black to-pink-600 hover:from-neutral-900 hover:to-pink-700 text-white px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add Product</span>
+                </button>
+              </div>
             )}
 
             {activeTab === 'orders' && (
@@ -1169,12 +1182,23 @@ export const AdminPanel = () => {
 
                   <div className="space-y-2.5">
                     <button
+                      onClick={() => { setActiveTab('products'); setShowBulkAddModal(true); }}
+                      className="w-full bg-purple-700 hover:bg-purple-800 text-white py-2.5 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-between shadow-sm cursor-pointer"
+                    >
+                      <span className="flex items-center gap-2">
+                        <Layers className="w-4 h-4 text-purple-200" />
+                        <span>Bulk Import (بلک ایڈ - 100+ Products)</span>
+                      </span>
+                      <ChevronRight className="w-4 h-4 text-purple-200" />
+                    </button>
+
+                    <button
                       onClick={() => { setActiveTab('products'); setShowAddModal(true); }}
-                      className="w-full bg-black hover:bg-neutral-950 text-white py-2.5 px-4 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all flex items-center justify-between shadow-sm"
+                      className="w-full bg-black hover:bg-neutral-950 text-white py-2.5 px-4 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all flex items-center justify-between shadow-sm cursor-pointer"
                     >
                       <span className="flex items-center gap-2">
                         <Plus className="w-4 h-4 text-pink-300" />
-                        <span>Add New Product</span>
+                        <span>Add Single Product</span>
                       </span>
                       <ChevronRight className="w-4 h-4 text-pink-200" />
                     </button>
@@ -1547,6 +1571,16 @@ export const AdminPanel = () => {
                   >
                     <RefreshCw className="w-3.5 h-3.5 text-pink-600" />
                     <span>Sync All Products ({products.length})</span>
+                  </button>
+
+                  {/* Bulk Import Button */}
+                  <button
+                    onClick={() => setShowBulkAddModal(true)}
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
+                    title="Import 10, 50, or 100+ Products at Once"
+                  >
+                    <Layers className="w-4 h-4" />
+                    <span>Bulk Import (بلک ایڈ)</span>
                   </button>
 
                   {/* Add Product Button */}
@@ -3350,6 +3384,15 @@ export const AdminPanel = () => {
           </div>
         )}
       </AnimatePresence>
+
+      {/* ======================================================== */}
+      {/* 📦 BULK PRODUCT & STOCK IMPORT MODAL (100+ PRODUCTS)   */}
+      {/* ======================================================== */}
+      <BulkProductImportModal
+        isOpen={showBulkAddModal}
+        onClose={() => setShowBulkAddModal(false)}
+        onBulkImport={addBulkProducts}
+      />
 
     </div>
   );

@@ -309,33 +309,25 @@ export const ShopProvider = ({ children }) => {
           combined.includes('login') ||
           combined.includes('dashboard');
 
-        setIsAdminMode(isAdminRoute);
-
-        // 2. Product Deep Link (#product=m-1 or ?product=m-1)
-        const prodMatch = hash.match(/product=([a-zA-Z0-9_-]+)/i) || search.match(/product=([a-zA-Z0-9_-]+)/i);
-        if (prodMatch && prodMatch[1]) {
-          const target = products.find((p) => p.id.toLowerCase() === prodMatch[1].toLowerCase());
-          if (target) {
-            setQuickViewProduct(target);
-          }
-        } else if (!hash.includes('product=') && !search.includes('product=')) {
-          if (!isAdminRoute) {
-            setQuickViewProduct(null);
-          }
+        if (isAdminRoute) {
+          setIsAdminMode(true);
+        } else if (combined.includes('storefront') || hash === '#storefront' || hash === '#home') {
+          setIsAdminMode(false);
         }
+        // Never automatically reset isAdminMode to false during ordinary product/stock updates!
 
-        // 3. Category Deep Link (#category=women or ?category=women)
+        // 2. Category Deep Link (#category=women or ?category=women)
         const catMatch = hash.match(/category=([a-zA-Z0-9_-]+)/i) || search.match(/category=([a-zA-Z0-9_-]+)/i);
         if (catMatch && catMatch[1]) {
           setSelectedCategory(catMatch[1]);
         }
 
-        // 4. Cart Deep Link (#cart)
+        // 3. Cart Deep Link (#cart)
         if (hash.includes('#cart')) {
           setIsCartOpen(true);
         }
 
-        // 5. Tracking Deep Link (#tracking)
+        // 4. Tracking Deep Link (#tracking)
         if (hash.includes('#tracking')) {
           setIsTrackingOpen(true);
         }
@@ -351,7 +343,7 @@ export const ShopProvider = ({ children }) => {
       window.removeEventListener('hashchange', handleRouteChange);
       window.removeEventListener('popstate', handleRouteChange);
     };
-  }, [products]);
+  }, []);
 
   // Sync quickViewProduct with browser hash for shareable URLs & back-button support
   const setQuickViewProductWithUrl = (prod) => {
@@ -522,6 +514,11 @@ export const ShopProvider = ({ children }) => {
       setAdminEmail(displayName);
       setIsAdminMode(true);
       setIsAdminAuthOpen(false);
+      try {
+        if (!window.location.hash.includes('admin')) {
+          window.location.hash = 'admin';
+        }
+      } catch {}
 
       const sessionObj = {
         role: role || 'owner',
@@ -577,6 +574,11 @@ export const ShopProvider = ({ children }) => {
     }
     setIsAdminMode(true);
     setIsAdminAuthOpen(true);
+    try {
+      if (!window.location.hash.includes('admin')) {
+        window.location.hash = 'admin';
+      }
+    } catch {}
   };
 
   const updateAdminCredentials = (newUsername, newPassword) => {
@@ -732,18 +734,86 @@ export const ShopProvider = ({ children }) => {
     showToast(`✨ Product "${p.title}" created & LIVE on Firebase Cloud!`);
   };
 
+  // Real-time Admin Bulk Import with Firebase Cloud Sync (100+ Products at Once)
+  const addBulkProducts = (newProductsList) => {
+    if (!Array.isArray(newProductsList) || newProductsList.length === 0) {
+      showToast('⚠️ No valid products found to import.');
+      return 0;
+    }
+
+    const timestamp = Date.now();
+    const formatted = newProductsList.map((item, index) => {
+      const stock = parseInt(item.stockCount) || parseInt(item.stock) || 20;
+      const price = parseFloat(item.price) || 0;
+      const title = (item.title || `Product #${index + 1}`).trim();
+      const cat = (item.category || 'women').toLowerCase().trim();
+      const subcat = (item.subcategory || 'Style').trim();
+      const rawColors = item.colors;
+      const colors = Array.isArray(rawColors)
+        ? rawColors
+        : (typeof rawColors === 'string' && rawColors.trim())
+        ? rawColors.split(',').map((s) => s.trim()).filter(Boolean)
+        : ['Standard'];
+      const rawSizes = item.sizes;
+      const sizes = Array.isArray(rawSizes)
+        ? rawSizes
+        : (typeof rawSizes === 'string' && rawSizes.trim())
+        ? rawSizes.split(',').map((s) => s.trim()).filter(Boolean)
+        : ['37', '38', '39', '40'];
+
+      return {
+        id: item.id || `p-${timestamp}-${index}-${Math.floor(Math.random() * 1000)}`,
+        title,
+        category: cat,
+        subcategory: subcat,
+        price,
+        stockCount: stock,
+        inStock: stock > 0,
+        rating: 5.0,
+        reviewsCount: 1,
+        enabled: item.enabled !== false,
+        isNew: true,
+        description: item.description || `${title} - Premium crafted luxury collection by Stylish Shoes & Bags.`,
+        image: item.image || 'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&q=80&w=800',
+        secondaryImage: item.secondaryImage || item.image || 'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&q=80&w=800',
+        colors,
+        sizes
+      };
+    });
+
+    setProducts((prev) => [...formatted, ...prev]);
+
+    // Save each to Firebase Cloud
+    formatted.forEach((p) => {
+      saveProductCloud(p);
+    });
+
+    setIsAdminMode(true);
+    if (!window.location.hash.includes('admin')) {
+      window.location.hash = 'admin';
+    }
+
+    showToast(`🎉 Successfully added ${formatted.length} products to inventory!`);
+    return formatted.length;
+  };
+
   const updateProductStock = (id, newStockCount) => {
     const count = Math.max(0, parseInt(newStockCount) || 0);
     setProducts((prev) =>
       prev.map((p) => (p.id === id ? { ...p, stockCount: count, inStock: count > 0 } : p))
     );
     updateStockCloud(id, count);
+    setIsAdminMode(true);
+    if (!window.location.hash.includes('admin')) {
+      window.location.hash = 'admin';
+    }
     showToast(`📦 Stock updated in Firebase Cloud`);
   };
 
   const deleteProduct = (id) => {
     setProducts((prev) => prev.filter((p) => p.id !== id));
     deleteProductCloud(id);
+    setIsAdminMode(true);
     showToast('Product deleted from Firebase inventory');
   };
 
@@ -1028,6 +1098,7 @@ export const ShopProvider = ({ children }) => {
         clearCart,
         toggleWishlist,
         addNewProduct,
+        addBulkProducts,
         updateProduct,
         updateProductStock,
         deleteProduct,
