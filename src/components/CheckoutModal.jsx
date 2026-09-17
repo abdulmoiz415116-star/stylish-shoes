@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useShop } from '../context/ShopContext';
 import { ShoppingBag, CheckCircle, Truck, CreditCard, Sparkles, Send, Copy, ExternalLink, X, Package, Printer, Download, Tag, AlertCircle, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { printOrderInvoice } from '../utils/printInvoice';
 
 export const CheckoutModal = () => {
   const {
@@ -339,14 +340,8 @@ export const CheckoutModal = () => {
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
-                  onClick={() => {
-                    if (window.printInvoice) {
-                      window.printInvoice(orderReceipt);
-                    } else {
-                      window.print();
-                    }
-                  }}
-                  className="w-full bg-black hover:bg-pink-700 text-white py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow"
+                  onClick={() => printOrderInvoice(orderReceipt)}
+                  className="w-full bg-black hover:bg-pink-700 text-white py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow cursor-pointer"
                 >
                   <Printer className="w-4 h-4 text-white" />
                   <span>Print Receipt</span>
@@ -354,16 +349,8 @@ export const CheckoutModal = () => {
 
                 <button
                   type="button"
-                  onClick={() => {
-                    if (window.downloadPdfInvoice) {
-                      window.downloadPdfInvoice(orderReceipt);
-                    } else if (window.printInvoice) {
-                      window.printInvoice(orderReceipt);
-                    } else {
-                      window.print();
-                    }
-                  }}
-                  className="w-full bg-pink-600 hover:bg-pink-700 text-white py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow"
+                  onClick={() => printOrderInvoice(orderReceipt)}
+                  className="w-full bg-pink-600 hover:bg-pink-700 text-white py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow cursor-pointer"
                 >
                   <Download className="w-4 h-4 text-white" />
                   <span>Download PDF</span>

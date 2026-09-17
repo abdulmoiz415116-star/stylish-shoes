@@ -4,6 +4,7 @@ import { CATEGORIES } from '../data/products';
 import { isFirebaseConfigured } from '../services/firebaseService';
 import { AdminReportsView } from './AdminReportsView';
 import { BulkProductImportModal } from './BulkProductImportModal';
+import { printOrderInvoice } from '../utils/printInvoice';
 import {
   LayoutDashboard,
   Package,
@@ -1952,22 +1953,19 @@ export const AdminPanel = () => {
                           <td className="p-3.5 text-right">
                             <div className="flex items-center justify-end gap-1.5">
                               <button
-                                onClick={() => {
-                                  if (window.printInvoice) window.printInvoice(o);
-                                  else setSelectedOrderModal(o);
-                                }}
-                                className="p-2 bg-pink-100 hover:bg-neutral-950 hover:text-white text-neutral-950 rounded-xl transition-colors border border-pink-200"
-                                title="Print Invoice"
+                                type="button"
+                                onClick={() => printOrderInvoice(o)}
+                                className="px-3 py-1.5 bg-neutral-950 hover:bg-pink-700 text-white rounded-xl transition-all shadow-xs flex items-center gap-1.5 font-bold text-xs cursor-pointer"
+                                title="Print Delivery Packing Invoice"
                               >
-                                <Printer className="w-4 h-4" />
+                                <Printer className="w-3.5 h-3.5 text-white" />
+                                <span>Print Receipt</span>
                               </button>
                               <button
-                                onClick={() => {
-                                  if (window.downloadPdfInvoice) window.downloadPdfInvoice(o);
-                                  else setSelectedOrderModal(o);
-                                }}
-                                className="p-2 bg-pink-50 hover:bg-pink-700 hover:text-white text-pink-800 rounded-xl transition-colors border border-pink-200"
-                                title="Download PDF Invoice"
+                                type="button"
+                                onClick={() => printOrderInvoice(o)}
+                                className="p-2 bg-pink-50 hover:bg-pink-700 hover:text-white text-pink-800 rounded-xl transition-colors border border-pink-200 cursor-pointer"
+                                title="Save as PDF Invoice"
                               >
                                 <Download className="w-4 h-4" />
                               </button>
@@ -2182,22 +2180,16 @@ export const AdminPanel = () => {
                           <td className="p-3.5 align-top text-right">
                             <div className="flex items-center justify-end gap-1.5">
                               <button
-                                onClick={() => {
-                                  if (window.printInvoice) window.printInvoice(o);
-                                  else setSelectedOrderModal(o);
-                                }}
-                                className="bg-neutral-950 hover:bg-black text-white px-2.5 py-1.5 rounded-xl text-[11px] font-black uppercase flex items-center gap-1 shadow-xs transition-colors"
+                                onClick={() => printOrderInvoice(o)}
+                                className="bg-neutral-950 hover:bg-black text-white px-2.5 py-1.5 rounded-xl text-[11px] font-black uppercase flex items-center gap-1 shadow-xs transition-colors cursor-pointer"
                                 title="Print Official Invoice"
                               >
                                 <Printer className="w-3.5 h-3.5 text-white" />
                                 <span>Print</span>
                               </button>
                               <button
-                                onClick={() => {
-                                  if (window.downloadPdfInvoice) window.downloadPdfInvoice(o);
-                                  else setSelectedOrderModal(o);
-                                }}
-                                className="bg-pink-700 hover:bg-pink-800 text-white px-2.5 py-1.5 rounded-xl text-[11px] font-black uppercase flex items-center gap-1 shadow-xs transition-colors"
+                                onClick={() => printOrderInvoice(o)}
+                                className="bg-pink-700 hover:bg-pink-800 text-white px-2.5 py-1.5 rounded-xl text-[11px] font-black uppercase flex items-center gap-1 shadow-xs transition-colors cursor-pointer"
                                 title="Download PDF Invoice"
                               >
                                 <Download className="w-3.5 h-3.5 text-white" />
@@ -2892,14 +2884,8 @@ export const AdminPanel = () => {
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
-                    onClick={() => {
-                      if (window.printInvoice) {
-                        window.printInvoice(selectedOrderModal);
-                      } else {
-                        window.print();
-                      }
-                    }}
-                    className="w-full bg-neutral-950 hover:bg-black text-white py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5 shadow"
+                    onClick={() => printOrderInvoice(selectedOrderModal)}
+                    className="w-full bg-neutral-950 hover:bg-black text-white py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5 shadow cursor-pointer"
                   >
                     <Printer className="w-4 h-4 text-white" />
                     <span>Print Invoice</span>
@@ -2907,16 +2893,8 @@ export const AdminPanel = () => {
 
                   <button
                     type="button"
-                    onClick={() => {
-                      if (window.downloadPdfInvoice) {
-                        window.downloadPdfInvoice(selectedOrderModal);
-                      } else if (window.printInvoice) {
-                        window.printInvoice(selectedOrderModal);
-                      } else {
-                        window.print();
-                      }
-                    }}
-                    className="w-full bg-pink-700 hover:bg-pink-800 text-white py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5 shadow"
+                    onClick={() => printOrderInvoice(selectedOrderModal)}
+                    className="w-full bg-pink-700 hover:bg-pink-800 text-white py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5 shadow cursor-pointer"
                   >
                     <Download className="w-4 h-4 text-white" />
                     <span>Download PDF</span>

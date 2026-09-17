@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useShop } from '../context/ShopContext';
-import { User, Package, MapPin, Phone, Mail, X, CheckCircle2, Clock, Truck, Eye, Heart, ShoppingBag, Trash2, ArrowRight } from 'lucide-react';
+import { User, Package, MapPin, Phone, Mail, X, CheckCircle2, Clock, Truck, Eye, Heart, ShoppingBag, Trash2, ArrowRight, Printer } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { printOrderInvoice } from '../utils/printInvoice';
 
 export const CustomerAccountModal = () => {
   const {
@@ -210,6 +211,13 @@ export const CustomerAccountModal = () => {
                             title="View Receipt"
                           >
                             <Eye className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => printOrderInvoice(o)}
+                            className="p-1.5 bg-neutral-950 hover:bg-black text-white rounded-lg border border-neutral-800 transition-colors cursor-pointer"
+                            title="Print Official Invoice / PDF"
+                          >
+                            <Printer className="w-4 h-4" />
                           </button>
                         </div>
                       </div>
