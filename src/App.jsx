@@ -52,7 +52,7 @@ const MainLayout = () => {
     searchQuery
   } = useShop();
 
-  // Admin Mode Route Guard (Exact same workflow as Salon Management Portal)
+  // Admin Mode Route Guard (Stylish Store Management Portal)
   if (isAdminMode) {
     if (isAdminAuthenticated) {
       return (
@@ -62,7 +62,7 @@ const MainLayout = () => {
         </>
       );
     }
-    // If not logged in, render the full-screen Salon-style Management Login Page!
+    // If not logged in, render the full-screen Store Management Login Page
     return (
       <>
         <AdminAuthModal fullPage={true} />

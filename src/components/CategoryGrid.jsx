@@ -50,7 +50,7 @@ export const CategoryGrid = () => {
   } = useShop();
 
   const [activeSubcatDrawer, setActiveSubcatDrawer] = useState(
-    selectedCategory !== 'all' ? selectedCategory : 'men'
+    selectedCategory !== 'all' ? selectedCategory : 'women'
   );
 
   // Keep drawer synchronized with global selectedCategory
@@ -61,23 +61,17 @@ export const CategoryGrid = () => {
   }, [selectedCategory]);
 
   const handleCategoryCardClick = (catId) => {
-    setSearchQuery('');
-    setSelectedCategory(catId);
-    setSelectedSubcategory(null);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setActiveSubcatDrawer(catId);
+    const drawerEl = document.getElementById('subcategories-showcase');
+    if (drawerEl) {
+      drawerEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
   };
 
-  const handleSubcategoryClick = (catId, subCat) => {
+  const handleNavigateToCategory = (catId, subCat = null) => {
     setSearchQuery('');
     setSelectedCategory(catId);
     setSelectedSubcategory(subCat);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleViewAllCategory = (catId) => {
-    setSearchQuery('');
-    setSelectedCategory(catId);
-    setSelectedSubcategory(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -85,7 +79,7 @@ export const CategoryGrid = () => {
   const activeSubcats = SUBCATEGORY_META[activeSubcatDrawer] || [];
 
   return (
-    <section className="py-16 sm:py-20 bg-gradient-to-b from-white via-pink-50/20 to-white font-poppins">
+    <section id="category-grid-section" className="py-16 sm:py-20 bg-gradient-to-b from-white via-pink-50/20 to-white font-poppins scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
@@ -134,10 +128,10 @@ export const CategoryGrid = () => {
 
                   {/* Top Floating Tag & Item Count Badge */}
                   <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none z-10">
-                    <span className="text-[10px] font-black tracking-wider uppercase bg-white/95 backdrop-blur-md px-3 py-1 rounded-full text-pink-700 border border-pink-200 shadow-xs">
+                    <span className="text-[10px] font-black tracking-wider uppercase bg-white px-3 py-1 rounded-full text-pink-700 border border-pink-200 shadow-xs">
                       {cat.tag}
                     </span>
-                    <span className="text-[10px] font-extrabold bg-black/85 backdrop-blur-md text-white px-2.5 py-0.5 rounded-full shadow-xs">
+                    <span className="text-[10px] font-extrabold bg-black text-white px-2.5 py-0.5 rounded-full shadow-xs">
                       {categoryProductCount} Items
                     </span>
                   </div>
@@ -168,10 +162,17 @@ export const CategoryGrid = () => {
                       <span>{cat.subcatCount} Subcategories</span>
                     </span>
 
-                    <span className="inline-flex items-center gap-1 text-pink-600 group-hover:text-black transition-colors font-black">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleNavigateToCategory(cat.id);
+                      }}
+                      className="inline-flex items-center gap-1.5 text-pink-600 hover:text-black font-black text-xs cursor-pointer bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-xl transition-all"
+                    >
                       <span>Explore</span>
                       <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                    </span>
+                    </button>
                   </div>
                 </div>
               </motion.div>
@@ -195,18 +196,18 @@ export const CategoryGrid = () => {
                 Select Subcategory To View Products
               </h3>
               <p className="text-xs text-neutral-500 font-medium">
-                Click any subcategory below to instantly filter store collection:
+                Click any subcategory below to instantly view its collection:
               </p>
             </div>
 
             {/* Quick Button: View All in this Category */}
             <div className="flex items-center gap-2">
               <button
-                onClick={() => handleViewAllCategory(activeSubcatDrawer)}
-                className="inline-flex items-center gap-2 bg-black hover:bg-neutral-900 text-white px-5 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider shadow transition-all hover:scale-105 cursor-pointer"
+                onClick={() => handleNavigateToCategory(activeSubcatDrawer, null)}
+                className="inline-flex items-center gap-2 bg-black hover:bg-pink-600 text-white px-5 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider shadow transition-all hover:scale-105 cursor-pointer"
               >
                 <ShoppingBag className="w-3.5 h-3.5 text-pink-400" />
-                <span>View All {activeCategoryObj.title.split(' ')[0]} Items →</span>
+                <span>View All {activeCategoryObj.title} ({products.filter((p) => p.category === activeSubcatDrawer).length}) →</span>
               </button>
             </div>
           </div>
@@ -225,7 +226,7 @@ export const CategoryGrid = () => {
                   key={subItem.name}
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => handleSubcategoryClick(activeSubcatDrawer, subItem.name)}
+                  onClick={() => handleNavigateToCategory(activeSubcatDrawer, subItem.name)}
                   className={`group relative overflow-hidden rounded-2xl p-2.5 border-2 transition-all cursor-pointer flex flex-col items-center text-center ${
                     isActiveSub
                       ? 'border-pink-600 bg-pink-50/50 shadow-md ring-2 ring-pink-500/20'

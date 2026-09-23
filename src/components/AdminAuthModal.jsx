@@ -4,7 +4,7 @@ import {
   Lock,
   User,
   Shield,
-  Scissors,
+  Briefcase,
   ArrowRight,
   Eye,
   EyeOff,
@@ -19,7 +19,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const AdminAuthModal = ({ fullPage = false }) => {
-  const { isAdminAuthOpen, setIsAdminAuthOpen, verifyAdminAuth, setIsAdminMode } = useShop();
+  const { isAdminAuthOpen, setIsAdminAuthOpen, verifyAdminAuth, setIsAdminMode, showToast } = useShop();
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -139,7 +139,7 @@ export const AdminAuthModal = ({ fullPage = false }) => {
               : 'text-gray-600 hover:text-pink-600'
           }`}
         >
-          <Scissors className="w-3.5 h-3.5" />
+          <Briefcase className="w-3.5 h-3.5" />
           <span>Staff / Manager</span>
         </button>
       </div>
@@ -174,7 +174,7 @@ export const AdminAuthModal = ({ fullPage = false }) => {
               required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="rubina or admin"
+              placeholder="admin or irshad"
               className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-xs sm:text-sm pl-3.5 pr-4 py-2.5 sm:py-3 rounded-xl focus:bg-white focus:border-pink-600 focus:ring-2 focus:ring-pink-100 outline-none transition-all font-medium"
               autoComplete="username"
             />
@@ -190,7 +190,16 @@ export const AdminAuthModal = ({ fullPage = false }) => {
                 <span>Password</span>
               </span>
             </label>
-            <span className="text-[10px] text-pink-600 font-bold hover:underline cursor-pointer">
+            <span
+              onClick={() => {
+                if (typeof showToast === 'function') {
+                  showToast('ℹ️ Password recovery: Please contact the store owner at +92 325 5964412');
+                } else {
+                  alert('Password recovery: Please contact the store owner at +92 325 5964412');
+                }
+              }}
+              className="text-[10px] text-pink-600 font-bold hover:underline cursor-pointer"
+            >
               Forgot Password?
             </span>
           </div>

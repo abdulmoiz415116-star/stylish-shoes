@@ -250,7 +250,7 @@ export const ShopProvider = ({ children }) => {
   // Admin Security & Auth State with Persistent Session
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => {
     try {
-      const session = localStorage.getItem('stylish_session') || localStorage.getItem('velvet_session');
+      const session = localStorage.getItem('stylish_session');
       if (session) {
         const parsed = JSON.parse(session);
         if (parsed && (parsed.role === 'owner' || parsed.role === 'staff')) return true;
@@ -266,7 +266,7 @@ export const ShopProvider = ({ children }) => {
 
   const [adminEmail, setAdminEmail] = useState(() => {
     try {
-      const session = localStorage.getItem('stylish_session') || localStorage.getItem('velvet_session');
+      const session = localStorage.getItem('stylish_session');
       if (session) {
         const parsed = JSON.parse(session);
         if (parsed?.name || parsed?.username) return parsed.name || parsed.username;
@@ -496,7 +496,6 @@ export const ShopProvider = ({ children }) => {
       { u: 'admin', p: 'admin12' },
       { u: 'irshad', p: 'admin123' },
       { u: 'irshad', p: 'stylish123' },
-      { u: 'rubina', p: 'admin12' },
       { u: 'owner', p: 'stylish123' }
     ];
 
@@ -506,8 +505,8 @@ export const ShopProvider = ({ children }) => {
 
     if (isCustomMatch || isDefaultMatch) {
       const displayName =
-        cleanUser === 'rubina' ? 'Rubina (Owner)' :
         cleanUser === 'irshad' ? 'Irshad (Owner)' :
+        cleanUser === 'admin' ? 'Store Administrator' :
         cleanUser.charAt(0).toUpperCase() + cleanUser.slice(1);
 
       setIsAdminAuthenticated(true);
@@ -530,7 +529,6 @@ export const ShopProvider = ({ children }) => {
       sessionStorage.setItem('stylish_admin_auth', 'true');
       sessionStorage.setItem('stylish_admin_email', displayName);
       localStorage.setItem('stylish_session', JSON.stringify(sessionObj));
-      localStorage.setItem('velvet_session', JSON.stringify(sessionObj));
 
       if (rememberMe) {
         localStorage.setItem('stylish_admin_auth', 'true');
@@ -544,7 +542,7 @@ export const ShopProvider = ({ children }) => {
     showToast('❌ Invalid username or password!');
     return {
       success: false,
-      message: 'Invalid credentials. Please enter valid details (e.g. rubina / admin12 or admin / admin123).'
+      message: 'Invalid credentials. Please enter valid details (e.g. admin / stylish123 or irshad / stylish123).'
     };
   };
 
@@ -560,9 +558,8 @@ export const ShopProvider = ({ children }) => {
     localStorage.removeItem('stylish_admin_auth');
     localStorage.removeItem('stylish_admin_email');
     localStorage.removeItem('stylish_session');
-    localStorage.removeItem('velvet_session');
     logoutAdminCloud();
-    setIsAdminMode(true); // Stay on admin mode to display login screen, exactly like salon
+    setIsAdminMode(true);
     setIsAdminAuthOpen(true);
     showToast('🔒 Admin session locked & logged out.');
   };
@@ -662,11 +659,17 @@ export const ShopProvider = ({ children }) => {
   };
 
   const removeFromCart = (productId, color, size) => {
-    setCart((prevCart) =>
-      prevCart.filter(
+    setCart((prevCart) => {
+      const itemToRemove = prevCart.find(
+        (item) => item.product.id === productId && item.selectedColor === color && item.selectedSize === size
+      );
+      if (itemToRemove) {
+        showToast(`🗑️ Removed "${itemToRemove.product.title}" from Shopping Bag`);
+      }
+      return prevCart.filter(
         (item) => !(item.product.id === productId && item.selectedColor === color && item.selectedSize === size)
-      )
-    );
+      );
+    });
   };
 
   const clearCart = () => {
@@ -955,7 +958,7 @@ export const ShopProvider = ({ children }) => {
       { id: 'c-1', code: 'STYLISH10', type: 'percentage', value: 10, minOrder: 0, active: true },
       { id: 'c-2', code: 'WELCOME500', type: 'fixed', value: 500, minOrder: 2000, active: true },
       { id: 'c-3', code: 'FREESHIP', type: 'free_shipping', value: 250, minOrder: 0, active: true },
-      { id: 'c-4', code: 'CLIVE10', type: 'percentage', value: 10, minOrder: 0, active: true },
+      { id: 'c-4', code: 'EID2026', type: 'percentage', value: 15, minOrder: 0, active: true },
       { id: 'c-5', code: 'WELCOME', type: 'percentage', value: 5, minOrder: 0, active: true },
     ];
 

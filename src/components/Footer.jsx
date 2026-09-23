@@ -109,12 +109,13 @@ export const Footer = () => {
     setSelectedCategory(catId);
     setSelectedSubcategory(subCat);
     setSearchQuery('');
-    const gridEl = document.getElementById('product-section');
-    if (gridEl) {
-      gridEl.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      window.scrollTo({ top: 500, behavior: 'smooth' });
-    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => {
+      const gridEl = document.getElementById('product-section');
+      if (gridEl) {
+        gridEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 80);
   };
 
   const policyData = {
@@ -227,7 +228,7 @@ export const Footer = () => {
       {/* ========================================================= */}
       {/* 1. VIP MEMBERSHIP / NEWSLETTER HEADER BAR                 */}
       {/* ========================================================= */}
-      <div className="border-b border-pink-100/80 bg-white/75 backdrop-blur-xs py-10">
+      <div className="border-b border-pink-100/80 bg-white py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
             
@@ -430,17 +431,17 @@ export const Footer = () => {
             <ul className="space-y-2.5 text-xs font-semibold text-neutral-700">
               <li>
                 <button
-                  onClick={() => handleNavCategory('men', 'kheri')}
-                  className="hover:text-pink-600 transition-colors flex items-center gap-1.5 group text-left w-full"
+                  onClick={() => handleNavCategory('men', 'Kheri')}
+                  className="hover:text-pink-600 transition-colors flex items-center gap-1.5 group text-left w-full cursor-pointer"
                 >
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 transition-colors" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-pink-600 transition-colors" />
                   <span className="font-bold text-neutral-900">Men's Kheri Chappal</span>
                 </button>
               </li>
               <li>
                 <button
-                  onClick={() => handleNavCategory('men', 'peshawari')}
-                  className="hover:text-pink-600 transition-colors flex items-center gap-1.5 group text-left w-full"
+                  onClick={() => handleNavCategory('men', 'Peshawari')}
+                  className="hover:text-pink-600 transition-colors flex items-center gap-1.5 group text-left w-full cursor-pointer"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-neutral-400 group-hover:bg-pink-600 transition-colors" />
                   <span>Peshawari Chappal</span>
@@ -448,8 +449,8 @@ export const Footer = () => {
               </li>
               <li>
                 <button
-                  onClick={() => handleNavCategory('men')}
-                  className="hover:text-pink-600 transition-colors flex items-center gap-1.5 group text-left w-full"
+                  onClick={() => handleNavCategory('men', 'Loafers')}
+                  className="hover:text-pink-600 transition-colors flex items-center gap-1.5 group text-left w-full cursor-pointer"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-neutral-400 group-hover:bg-pink-600 transition-colors" />
                   <span>Men's Casual &amp; Loafers</span>
@@ -457,8 +458,8 @@ export const Footer = () => {
               </li>
               <li>
                 <button
-                  onClick={() => handleNavCategory('women', 'bridal')}
-                  className="hover:text-pink-600 transition-colors flex items-center gap-1.5 group text-left w-full"
+                  onClick={() => handleNavCategory('women', 'Fancy Bridal')}
+                  className="hover:text-pink-600 transition-colors flex items-center gap-1.5 group text-left w-full cursor-pointer"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-neutral-400 group-hover:bg-pink-600 transition-colors" />
                   <span>Bridal &amp; Evening Heels</span>
@@ -466,8 +467,8 @@ export const Footer = () => {
               </li>
               <li>
                 <button
-                  onClick={() => handleNavCategory('accessories', 'bags')}
-                  className="hover:text-pink-600 transition-colors flex items-center gap-1.5 group text-left w-full"
+                  onClick={() => handleNavCategory('accessories', 'Ladies Bags')}
+                  className="hover:text-pink-600 transition-colors flex items-center gap-1.5 group text-left w-full cursor-pointer"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-neutral-400 group-hover:bg-pink-600 transition-colors" />
                   <span>Luxury Handbags &amp; Clutches</span>
@@ -476,7 +477,7 @@ export const Footer = () => {
               <li>
                 <button
                   onClick={() => handleNavCategory('kids')}
-                  className="hover:text-pink-600 transition-colors flex items-center gap-1.5 group text-left w-full"
+                  className="hover:text-pink-600 transition-colors flex items-center gap-1.5 group text-left w-full cursor-pointer"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-neutral-400 group-hover:bg-pink-600 transition-colors" />
                   <span>Kids School &amp; Party Footwear</span>
@@ -484,8 +485,8 @@ export const Footer = () => {
               </li>
               <li>
                 <button
-                  onClick={() => handleNavCategory('all')}
-                  className="hover:text-pink-600 transition-colors flex items-center gap-1.5 group text-left w-full"
+                  onClick={() => handleNavCategory('men', 'Medicated')}
+                  className="hover:text-pink-600 transition-colors flex items-center gap-1.5 group text-left w-full cursor-pointer"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-neutral-400 group-hover:bg-pink-600 transition-colors" />
                   <span>Medicated &amp; Orthopedic</span>
@@ -637,7 +638,7 @@ export const Footer = () => {
       {/* ========================================================= */}
       {/* 4. PAYMENT METHODS & CURRENCY ROW                         */}
       {/* ========================================================= */}
-      <div className="border-t border-pink-100/90 bg-white/60 backdrop-blur-xs py-5">
+      <div className="border-t border-pink-100/90 bg-white/90 py-5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
           
           {/* Accepted Methods */}

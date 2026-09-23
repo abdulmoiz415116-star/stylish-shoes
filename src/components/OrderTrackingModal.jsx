@@ -28,9 +28,10 @@ export const OrderTrackingModal = () => {
 
   const getStatusStep = (status) => {
     const s = (status || '').toLowerCase();
-    if (s === 'delivered') return 3;
-    if (s === 'dispatched') return 2;
-    return 1; // Pending
+    if (s === 'delivered') return 4;
+    if (s === 'dispatched') return 3;
+    if (s === 'processing') return 2;
+    return 1; // Pending / Received
   };
 
   return (
@@ -102,7 +103,7 @@ export const OrderTrackingModal = () => {
                   {/* Status Timeline */}
                   <div className="space-y-2">
                     <h4 className="text-xs font-extrabold text-neutral-950 uppercase tracking-wider">Live Status Timeline</h4>
-                    <div className="grid grid-cols-3 gap-2 text-center pt-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center pt-2">
                       {/* Step 1: Pending */}
                       <div
                         className={`p-3 rounded-xl border flex flex-col items-center gap-1 transition-all ${
@@ -111,11 +112,11 @@ export const OrderTrackingModal = () => {
                             : 'bg-gray-100 text-gray-400 border-gray-200'
                         }`}
                       >
-                        <Clock className="w-5 h-5" />
-                        <span className="text-[11px] font-extrabold uppercase">1. Received</span>
+                        <Clock className="w-4 h-4 text-pink-400" />
+                        <span className="text-[10px] font-extrabold uppercase">1. Received</span>
                       </div>
 
-                      {/* Step 2: Dispatched */}
+                      {/* Step 2: Processing */}
                       <div
                         className={`p-3 rounded-xl border flex flex-col items-center gap-1 transition-all ${
                           getStatusStep(searchedOrder.status) >= 2
@@ -123,20 +124,32 @@ export const OrderTrackingModal = () => {
                             : 'bg-gray-100 text-gray-400 border-gray-200'
                         }`}
                       >
-                        <Truck className="w-5 h-5" />
-                        <span className="text-[11px] font-extrabold uppercase">2. Dispatched</span>
+                        <Package className="w-4 h-4 text-amber-400" />
+                        <span className="text-[10px] font-extrabold uppercase">2. Processing</span>
                       </div>
 
-                      {/* Step 3: Delivered */}
+                      {/* Step 3: Dispatched */}
                       <div
                         className={`p-3 rounded-xl border flex flex-col items-center gap-1 transition-all ${
                           getStatusStep(searchedOrder.status) >= 3
+                            ? 'bg-black text-white border-black shadow'
+                            : 'bg-gray-100 text-gray-400 border-gray-200'
+                        }`}
+                      >
+                        <Truck className="w-4 h-4 text-blue-400" />
+                        <span className="text-[10px] font-extrabold uppercase">3. Dispatched</span>
+                      </div>
+
+                      {/* Step 4: Delivered */}
+                      <div
+                        className={`p-3 rounded-xl border flex flex-col items-center gap-1 transition-all ${
+                          getStatusStep(searchedOrder.status) >= 4
                             ? 'bg-emerald-600 text-white border-emerald-600 shadow'
                             : 'bg-gray-100 text-gray-400 border-gray-200'
                         }`}
                       >
-                        <CheckCircle2 className="w-5 h-5" />
-                        <span className="text-[11px] font-extrabold uppercase">3. Delivered</span>
+                        <CheckCircle2 className="w-4 h-4 text-emerald-200" />
+                        <span className="text-[10px] font-extrabold uppercase">4. Delivered</span>
                       </div>
                     </div>
                   </div>

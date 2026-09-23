@@ -118,22 +118,20 @@ export const Header = () => {
     setSearchQuery('');
     setMobileMenuOpen(false);
     setActiveHoverCategory(null);
+    if (typeof setIsAdminMode === 'function') setIsAdminMode(false);
+
     if (catId === 'all') {
       handleGoHome();
       return;
     }
-    if (subCat) {
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => {
       const gridEl = document.getElementById('product-section');
-      if (gridEl) gridEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else {
-      const showcaseEl = document.getElementById('subcategories-showcase');
-      if (showcaseEl) {
-        showcaseEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      } else {
-        const gridEl = document.getElementById('product-section');
-        if (gridEl) gridEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (gridEl) {
+        gridEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-    }
+    }, 80);
   };
 
   const handleSearchSubmit = (e) => {
@@ -398,20 +396,20 @@ export const Header = () => {
             {/* Discreet Management Portal Trigger (Small icon only, no giveaway text) */}
             <button
               onClick={() => openAdminPanel(true)}
-              className="p-1.5 sm:p-2 text-gray-500 hover:text-neutral-950 hover:bg-pink-50 rounded-full transition-all cursor-pointer"
+              className="hidden sm:flex p-1.5 sm:p-2 text-gray-500 hover:text-neutral-950 hover:bg-pink-50 rounded-full transition-all cursor-pointer"
               title="Secure Access"
               aria-label="Secure Access"
             >
               <Lock className="w-4 h-4" />
             </button>
 
-            {/* Wishlist (Shown on desktop & tablet, opens dedicated Wishlist tab) */}
+            {/* Wishlist (Shown on desktop & tablet, mobile has bottom bar) */}
             <button
               onClick={() => {
                 if (typeof setCustomerAccountTab === 'function') setCustomerAccountTab('wishlist');
                 setIsCustomerAccountOpen(true);
               }}
-              className="relative p-1.5 sm:p-2 text-gray-700 hover:text-pink-600 hover:bg-pink-50 rounded-full transition-all cursor-pointer"
+              className="hidden sm:flex relative p-1.5 sm:p-2 text-gray-700 hover:text-pink-600 hover:bg-pink-50 rounded-full transition-all cursor-pointer"
               title={`Wishlist (${wishlist.length} saved items)`}
               aria-label="View Saved Wishlist"
             >
@@ -423,13 +421,13 @@ export const Header = () => {
               )}
             </button>
 
-            {/* Customer Account / My Profile Trigger (Top-Right Corner) */}
+            {/* Customer Account / My Profile Trigger (Desktop & tablet) */}
             <button
               onClick={() => {
                 if (typeof setCustomerAccountTab === 'function') setCustomerAccountTab('orders');
                 setIsCustomerAccountOpen(true);
               }}
-              className="relative p-1.5 sm:p-2 text-gray-700 hover:text-pink-600 hover:bg-pink-50 rounded-full transition-all cursor-pointer flex items-center gap-1.5"
+              className="hidden sm:flex relative p-1.5 sm:p-2 text-gray-700 hover:text-pink-600 hover:bg-pink-50 rounded-full transition-all cursor-pointer items-center gap-1.5"
               title="My Account, Orders & Profile"
               aria-label="My Account"
             >
@@ -503,6 +501,19 @@ export const Header = () => {
                   )}
                 </div>
               ))}
+
+              <div className="pt-3 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-500">
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    openAdminPanel(true);
+                  }}
+                  className="flex items-center gap-1.5 text-neutral-400 hover:text-neutral-900 py-1 cursor-pointer"
+                >
+                  <Lock className="w-3.5 h-3.5" />
+                  <span>Portal Access</span>
+                </button>
+              </div>
             </div>
           </motion.div>
         )}

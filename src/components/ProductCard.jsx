@@ -4,7 +4,7 @@ import { Heart, Eye, ShoppingBag, Star, Share2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const ProductCard = ({ product }) => {
-  const { wishlist, toggleWishlist, addToCart, setQuickViewProduct } = useShop();
+  const { wishlist, toggleWishlist, addToCart, setQuickViewProduct, setIsCartOpen } = useShop();
   const [isHovered, setIsHovered] = useState(false);
   const [selectedSize, setSelectedSize] = useState(() => (product.sizes ? product.sizes[0] : ''));
   const [selectedColor, setSelectedColor] = useState(() => (product.colors ? product.colors[0] : ''));
@@ -14,6 +14,7 @@ export const ProductCard = ({ product }) => {
   const handleQuickAdd = (e) => {
     e.stopPropagation();
     addToCart(product, selectedColor, selectedSize);
+    setIsCartOpen(true);
   };
 
   const handleShareWhatsApp = (e) => {
@@ -40,7 +41,9 @@ export const ProductCard = ({ product }) => {
         <img
           src={product.image}
           alt={product.title}
-          className="w-full h-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-110"
+          loading="lazy"
+          decoding="async"
+          className="w-full h-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
           onError={(e) => {
             if (e.target.dataset.triedFallback) return;
             e.target.dataset.triedFallback = 'true';
@@ -74,10 +77,10 @@ export const ProductCard = ({ product }) => {
               e.stopPropagation();
               toggleWishlist(product.id);
             }}
-            className={`p-1.5 sm:p-2 rounded-full backdrop-blur-md transition-all duration-200 shadow-md ${
+            className={`p-1.5 sm:p-2 rounded-full transition-all duration-200 shadow-md ${
               isWishlisted
                 ? 'bg-pink-600 text-white scale-110'
-                : 'bg-white/85 text-gray-700 hover:bg-white hover:text-pink-600 hover:scale-110'
+                : 'bg-white text-gray-700 hover:bg-white hover:text-pink-600 hover:scale-110'
             }`}
             aria-label="Wishlist"
             title="Add to Wishlist"
@@ -87,7 +90,7 @@ export const ProductCard = ({ product }) => {
 
           <button
             onClick={handleShareWhatsApp}
-            className="p-1.5 sm:p-2 rounded-full bg-white/85 text-emerald-600 hover:bg-emerald-600 hover:text-white backdrop-blur-md transition-all duration-200 shadow-md hover:scale-110"
+            className="p-1.5 sm:p-2 rounded-full bg-white text-emerald-600 hover:bg-emerald-600 hover:text-white transition-all duration-200 shadow-md hover:scale-110"
             aria-label="Share on WhatsApp"
             title="Share on WhatsApp"
           >
@@ -102,7 +105,7 @@ export const ProductCard = ({ product }) => {
               e.stopPropagation();
               setQuickViewProduct(product);
             }}
-            className="flex-1 bg-white/95 hover:bg-white text-neutral-950 text-xs font-extrabold py-2 px-3 rounded-xl shadow backdrop-blur-sm transition-all duration-200 flex items-center justify-center gap-1.5 uppercase tracking-wider"
+            className="flex-1 bg-white hover:bg-pink-50 text-neutral-950 text-xs font-extrabold py-2 px-3 rounded-xl shadow transition-all duration-200 flex items-center justify-center gap-1.5 uppercase tracking-wider"
           >
             <Eye className="w-3.5 h-3.5" />
             <span>Quick View</span>

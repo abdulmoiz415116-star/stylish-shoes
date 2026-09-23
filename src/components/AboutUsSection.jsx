@@ -40,8 +40,8 @@ export const AboutUsSection = () => {
   return (
     <section id="about-section" className="py-20 bg-gradient-to-b from-white via-pink-50/20 to-white text-neutral-900 font-poppins relative overflow-hidden border-t border-neutral-100">
       {/* Decorative ambient background accents */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-pink-100/30 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-neutral-100/50 rounded-full blur-3xl pointer-events-none -ml-20 -mb-20" />
+      <div className="hidden sm:block absolute top-0 right-0 w-96 h-96 bg-pink-100/30 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
+      <div className="hidden sm:block absolute bottom-0 left-0 w-96 h-96 bg-neutral-100/50 rounded-full blur-3xl pointer-events-none -ml-20 -mb-20" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         

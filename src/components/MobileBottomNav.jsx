@@ -39,7 +39,7 @@ export const MobileBottomNav = () => {
   };
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-pink-100 shadow-[0_-8px_20px_rgba(0,0,0,0.08)] px-2 py-1.5 transition-all">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-pink-100 shadow-[0_-4px_25px_rgba(0,0,0,0.12)] px-2 py-1.5 transition-all">
       <div className="flex items-center justify-around max-w-md mx-auto">
         {/* 1. Home */}
         <button

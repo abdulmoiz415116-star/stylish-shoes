@@ -1,84 +1,175 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { HERO_SLIDES } from '../data/products';
 import { useShop } from '../context/ShopContext';
-import { ArrowRight, Sparkles, Star, ShieldCheck, Truck, ShoppingBag, ChevronRight, ChevronLeft } from 'lucide-react';
+import { 
+  ArrowRight, 
+  Sparkles, 
+  Star, 
+  Truck, 
+  ShoppingBag, 
+  ChevronRight, 
+  ChevronLeft, 
+  ShieldCheck, 
+  Flame
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const HeroBanner = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const { setSelectedCategory } = useShop();
+  const [isPaused, setIsPaused] = useState(false);
+  const { setSelectedCategory, setSelectedSubcategory } = useShop();
+  const touchStartX = useRef(null);
 
+  // Auto-advance slides every 6.5s unless paused by mouse hover
   useEffect(() => {
+    if (isPaused) return;
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
     }, 6500);
     return () => clearInterval(timer);
-  }, []);
+  }, [isPaused]);
 
   const slide = HERO_SLIDES[currentSlide];
 
-  const handleCtaClick = (category) => {
+  const handleCtaClick = (category, subcategory = null) => {
     setSelectedCategory(category);
+    setSelectedSubcategory(subcategory);
     const gridEl = document.getElementById('product-section');
     if (gridEl) {
       gridEl.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
-  return (
-    <section className="relative w-full bg-white border-b border-neutral-200/80 overflow-hidden font-poppins">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
 
-          {/* ========================================================= */}
-          {/* LEFT: EDITORIAL LUXURY BRANDING & CALL-TO-ACTION */}
-          {/* ========================================================= */}
-          <div className="lg:col-span-6 space-y-6 text-left">
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current === null) return;
+    const diffX = touchStartX.current - e.changedTouches[0].clientX;
+    if (diffX > 50) {
+      // Swipe left -> next slide
+      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+    } else if (diffX < -50) {
+      // Swipe right -> prev slide
+      setCurrentSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
+    }
+    touchStartX.current = null;
+  };
+
+  return (
+    <section 
+      className="relative w-full min-h-[540px] sm:min-h-[600px] lg:min-h-[660px] bg-white border-b border-neutral-200/80 overflow-hidden font-poppins select-none"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* ========================================================= */}
+      {/* 1. RIGHT-ALIGNED TRANSPARENT PNG SLIDER CONTAINER */}
+      {/* ========================================================= */}
+      {/* On desktop: Isolated transparent PNG image cleanly positioned on the right */}
+      <div className="absolute top-0 right-0 bottom-0 w-full lg:w-[58%] z-0 bg-transparent overflow-hidden pointer-events-none flex items-center justify-end">
+        <AnimatePresence initial={false} mode="sync">
+          <motion.div
+            key={`hero-bg-${slide.id}`}
+            initial={{ opacity: 0, x: 50, scale: 0.95 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: -50, scale: 0.95 }}
+            transition={{ duration: 0.6, ease: [0.25, 1, 0.5, 1] }}
+            className="w-full h-full flex items-center justify-end pr-4 sm:pr-8 lg:pr-12"
+          >
+            <img
+              src={slide.image}
+              alt={slide.title}
+              className="w-auto h-auto max-h-[75%] max-w-[90%] lg:max-h-[82%] lg:max-w-[85%] object-contain filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.12)]"
+            />
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* ========================================================= */}
+      {/* 2. FOREGROUND 100% TRANSPARENT EDITORIAL CONTENT CONTAINER */}
+      {/* ========================================================= */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16 flex flex-col justify-between min-h-[540px] sm:min-h-[600px] lg:min-h-[660px]">
+        
+        {/* Main Grid: Left Column Text (50% width) / Right Column Open for Imagery */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center my-auto">
+          
+          {/* Left Column: Pure Transparent Text with Zero Image Behind It */}
+          <div className="lg:col-span-6 xl:col-span-6">
             <AnimatePresence mode="wait">
               <motion.div
-                key={`text-${slide.id}`}
-                initial={{ opacity: 0, y: 15 }}
+                key={`content-${slide.id}`}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 0.45, ease: 'easeOut' }}
-                className="space-y-5"
+                exit={{ opacity: 0, y: -16 }}
+                transition={{ duration: 0.4, ease: 'easeOut' }}
+                className="bg-white/90 lg:bg-transparent p-4 sm:p-6 lg:p-0 rounded-3xl lg:rounded-none space-y-4 sm:space-y-5 text-left"
               >
-                {/* Couture Badge */}
-                <div className="inline-flex items-center gap-2 bg-pink-50/80 backdrop-blur-md px-4 py-1.5 rounded-full border border-pink-200 shadow-xs">
-                  <Sparkles className="w-4 h-4 text-pink-600 animate-pulse" />
-                  <span className="text-[11px] font-black tracking-[0.2em] text-pink-900 uppercase">
-                    {slide.tag}
+                {/* Category Pill Tag & Department Badge */}
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <div className="inline-flex items-center gap-2 bg-pink-50 text-pink-700 border border-pink-200 px-3.5 py-1 rounded-full shadow-xs">
+                    <Sparkles className="w-3.5 h-3.5 text-pink-600 animate-pulse" />
+                    <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em]">
+                      {slide.tag}
+                    </span>
+                  </div>
+
+                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-700 bg-white border border-neutral-200 px-3 py-1 rounded-full shadow-xs">
+                    <Flame className="w-3.5 h-3.5 text-orange-500" />
+                    <span className="font-bold text-neutral-900">{slide.badge}</span>
                   </span>
                 </div>
 
-                {/* Main Headline (Black & Pink) */}
-                <div className="space-y-1.5">
-                  <h1 className="text-3xl sm:text-4xl lg:text-[44px] font-black text-black tracking-tight leading-[1.15] uppercase">
+                {/* Main Headline (Black & Radiant Pink) */}
+                <div className="space-y-1">
+                  <h1 className="text-3xl sm:text-4xl lg:text-[46px] font-black text-neutral-950 tracking-tight leading-[1.1] uppercase">
                     {slide.title}
                   </h1>
-                  <span className="block text-2xl sm:text-3xl lg:text-[34px] font-extrabold text-pink-600 tracking-tight">
+                  <span className="block text-2xl sm:text-3xl lg:text-[36px] font-black text-pink-600 tracking-tight">
                     {slide.subtitlePart2}
                   </span>
                 </div>
 
-                {/* Subtitle Description */}
-                <p className="text-sm sm:text-base text-neutral-600 font-medium leading-relaxed max-w-lg">
+                {/* Narrative Description */}
+                <p className="text-sm sm:text-base text-neutral-700 font-medium leading-relaxed max-w-lg">
                   {slide.description}
                 </p>
 
-                {/* Action Buttons (Pink & Hover Black) */}
-                <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                {/* Featured Product Floating Pill */}
+                <div className="inline-flex items-center gap-3 bg-white border border-neutral-200 p-2 sm:p-2.5 rounded-2xl shadow-sm">
+                  <div className="w-10 h-10 rounded-xl overflow-hidden bg-neutral-100 shrink-0 border border-neutral-200">
+                    <img src={slide.image} alt={slide.productTitle} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="text-left pr-2">
+                    <span className="text-[9px] uppercase font-bold text-neutral-500 tracking-wider block">
+                      FEATURED MASTERPIECE
+                    </span>
+                    <span className="text-xs sm:text-sm font-black text-neutral-900 block truncate max-w-[180px] sm:max-w-xs">
+                      {slide.productTitle}
+                    </span>
+                  </div>
+                  <div className="bg-pink-600 text-white font-black text-xs sm:text-sm px-3 py-1.5 rounded-xl ml-auto shadow-xs">
+                    {slide.price}
+                  </div>
+                </div>
+
+                {/* Call-to-Action Buttons */}
+                <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
                   <button
-                    onClick={() => handleCtaClick(slide.category)}
-                    className="group inline-flex items-center justify-center gap-3 bg-pink-600 hover:bg-black text-white px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-pink-600/25 transition-all duration-300 hover:scale-105 cursor-pointer w-full sm:w-auto"
+                    onClick={() => handleCtaClick(slide.category, slide.subcategory || null)}
+                    className="group inline-flex items-center justify-center gap-3 bg-pink-600 hover:bg-neutral-950 text-white px-7 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-xs sm:text-sm font-black uppercase tracking-widest shadow-xl shadow-pink-600/30 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] cursor-pointer"
                   >
                     <span>{slide.ctaPrimary}</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
                   </button>
 
                   <button
-                    onClick={() => handleCtaClick(slide.category === 'women' ? 'men' : 'women')}
-                    className="inline-flex items-center justify-center gap-2 bg-white hover:bg-pink-50 text-neutral-950 hover:text-pink-600 px-5 sm:px-6 py-3.5 sm:py-4 rounded-2xl text-xs font-black uppercase tracking-wider border-2 border-pink-200 hover:border-pink-500 transition-all duration-200 shadow-xs cursor-pointer w-full sm:w-auto"
+                    onClick={() => handleCtaClick(slide.category, null)}
+                    className="inline-flex items-center justify-center gap-2 bg-white hover:bg-pink-50 text-neutral-950 hover:text-pink-600 px-6 sm:px-7 py-3.5 sm:py-4 rounded-2xl text-xs sm:text-sm font-black uppercase tracking-wider border-2 border-neutral-200 hover:border-pink-500 transition-all duration-200 shadow-sm cursor-pointer"
                   >
                     <ShoppingBag className="w-4 h-4 text-pink-600" />
                     <span>{slide.ctaSecondary}</span>
@@ -86,117 +177,111 @@ export const HeroBanner = () => {
                 </div>
 
                 {/* Trust Badges */}
-                <div className="pt-3 flex flex-wrap items-center gap-3 sm:gap-4 text-xs font-semibold text-neutral-600">
+                <div className="pt-2 flex flex-wrap items-center gap-4 sm:gap-6 text-xs text-neutral-700 font-medium">
                   <div className="flex items-center gap-1.5 text-amber-500">
                     <Star className="w-4 h-4 fill-amber-400 stroke-none" />
                     <span className="font-extrabold text-neutral-900">4.9 / 5.0</span>
-                    <span className="text-neutral-400 font-normal">(15,000+ Happy Customers)</span>
+                    <span className="text-neutral-500 font-normal">(15k+ Reviews)</span>
                   </div>
                   <span className="text-neutral-300 hidden sm:inline">&bull;</span>
-                  <div className="flex items-center gap-1.5 text-neutral-800">
+                  <div className="flex items-center gap-1.5">
                     <Truck className="w-4 h-4 text-pink-600" />
-                    <span>Free Express Delivery Above Rs. 4,000</span>
+                    <span className="font-semibold text-neutral-800">Free Delivery Above Rs. 4,000</span>
+                  </div>
+                  <span className="text-neutral-300 hidden sm:inline">&bull;</span>
+                  <div className="flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                    <span className="font-semibold text-neutral-800">COD Across Pakistan</span>
                   </div>
                 </div>
               </motion.div>
             </AnimatePresence>
-
-            {/* Interactive Lookbook Thumbnails */}
-            <div className="pt-6 border-t border-neutral-200">
-              <span className="text-[10px] font-black uppercase tracking-widest text-neutral-400 block mb-2.5">
-                SELECT LOOKBOOK:
-              </span>
-              <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-none max-w-full">
-                {HERO_SLIDES.map((s, idx) => (
-                  <button
-                    key={s.id}
-                    onClick={() => setCurrentSlide(idx)}
-                    className={`flex-shrink-0 min-w-[130px] sm:min-w-0 flex items-center gap-2 p-1.5 pr-3 rounded-2xl border-2 transition-all cursor-pointer ${
-                      currentSlide === idx
-                        ? 'border-pink-600 bg-pink-50/40 shadow-sm scale-105'
-                        : 'border-neutral-200 bg-white hover:bg-neutral-50 opacity-75'
-                    }`}
-                  >
-                    <img
-                      src={s.image}
-                      alt={s.productTitle}
-                      className="w-10 h-10 object-cover rounded-xl bg-neutral-100"
-                    />
-                    <div className="text-left">
-                      <span className="text-[10px] font-bold text-neutral-400 block leading-none">0{idx + 1}</span>
-                      <span className="text-xs font-black text-neutral-900 block leading-tight truncate max-w-[90px]">
-                        {s.productTitle.split(' ')[0]} {s.productTitle.split(' ')[1]}
-                      </span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
 
-          {/* ========================================================= */}
-          {/* RIGHT: PRO MASTERPIECE PRODUCT STAGE (STUDIO PHOTOGRAPHY) */}
-          {/* ========================================================= */}
-          <div className="lg:col-span-6 relative">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`stage-${slide.id}`}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.55, ease: 'easeOut' }}
-                className="relative"
-              >
-                {/* Main Product Showcase Box - Pure Studio Look with ZERO OVERLAY */}
-                <div className="relative aspect-[4/3] sm:aspect-[16/11] rounded-3xl overflow-hidden bg-neutral-50 border border-neutral-200 shadow-xl group">
-                  <img
-                    src={slide.image}
-                    alt={slide.productTitle}
-                    className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
-                  />
+          {/* Right Column: Visual Area (Dedicated to the right-aligned image) */}
+          <div className="hidden lg:block lg:col-span-6 xl:col-span-6" />
 
-                  {/* Top Luxury Tag */}
-                  <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-10 bg-white/95 backdrop-blur-md px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-[11px] font-black text-neutral-900 uppercase tracking-wider shadow-md border border-neutral-200 flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                    <span>{slide.highlightTag}</span>
+        </div>
+
+        {/* ========================================================= */}
+        {/* 3. BOTTOM CONTROLS & INTERACTIVE 5 LOOKBOOK TABS */}
+        {/* ========================================================= */}
+        <div className="pt-6 sm:pt-8 border-t border-neutral-200 flex flex-col md:flex-row items-center justify-between gap-4">
+          
+          {/* 5 Category Navigation Tabs with Live Progress */}
+          <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-none">
+            {HERO_SLIDES.map((s, idx) => {
+              const isActive = currentSlide === idx;
+              return (
+                <button
+                  key={s.id}
+                  onClick={() => setCurrentSlide(idx)}
+                  className={`group relative flex items-center gap-2.5 px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-xl transition-all duration-300 text-left shrink-0 cursor-pointer overflow-hidden ${
+                    isActive
+                      ? 'bg-white border-2 border-pink-600 shadow-md text-neutral-950 scale-102'
+                      : 'bg-neutral-50 hover:bg-white border border-neutral-200 text-neutral-600 hover:text-neutral-900'
+                  }`}
+                >
+                  {/* Miniature Thumbnail */}
+                  <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg overflow-hidden border ${isActive ? 'border-pink-600' : 'border-neutral-200'}`}>
+                    <img src={s.image} alt={s.badge} className="w-full h-full object-cover" />
                   </div>
 
-                  {/* Clean Minimalist Corner Price Badge (No Heavy Overlay) */}
-                  <div className="absolute left-3 bottom-3 sm:left-auto sm:right-4 sm:bottom-4 z-10 bg-white/95 backdrop-blur-md px-3 sm:px-4 py-1.5 sm:py-2 rounded-2xl text-neutral-900 shadow-xl border border-neutral-200 flex items-center gap-2 sm:gap-3 max-w-[70%] sm:max-w-none">
-                    <div className="truncate">
-                      <span className="text-[9px] sm:text-[10px] text-neutral-400 font-bold uppercase tracking-wider block truncate">
-                        AUTHENTIC COLLECTION
-                      </span>
-                      <h4 className="text-[11px] sm:text-xs font-black text-neutral-900 truncate">{slide.productTitle}</h4>
-                    </div>
-                    <span className="text-[11px] sm:text-xs font-black text-neutral-900 bg-neutral-100 px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl border border-neutral-200 shrink-0">
-                      {slide.price}
+                  <div className="flex flex-col">
+                    <span className="text-[9px] font-mono leading-none text-pink-600 font-bold">
+                      0{idx + 1}
+                    </span>
+                    <span className="text-xs font-bold whitespace-nowrap">
+                      {s.badge}
                     </span>
                   </div>
-                </div>
 
-                {/* Prev / Next Slide Floating Navigation */}
-                <div className="absolute -bottom-4 right-3 sm:-bottom-5 sm:right-6 flex items-center gap-1.5 sm:gap-2 z-20">
-                  <button
-                    onClick={() => setCurrentSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)}
-                    className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-white hover:bg-neutral-900 text-neutral-800 hover:text-white shadow-xl border border-neutral-200 transition-all hover:scale-110 cursor-pointer"
-                    aria-label="Previous Slide"
-                  >
-                    <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-                  </button>
-                  <button
-                    onClick={() => setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length)}
-                    className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-white hover:bg-neutral-900 text-neutral-800 hover:text-white shadow-xl border border-neutral-200 transition-all hover:scale-110 cursor-pointer"
-                    aria-label="Next Slide"
-                  >
-                    <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
-                  </button>
-                </div>
-              </motion.div>
-            </AnimatePresence>
+                  {/* Active Indicator Pulse */}
+                  {isActive && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-pink-600 animate-pulse ml-1" />
+                  )}
+
+                  {/* Bottom Line Progress when Active */}
+                  {isActive && !isPaused && (
+                    <motion.div
+                      layoutId="tabProgress"
+                      initial={{ width: 0 }}
+                      animate={{ width: '100%' }}
+                      transition={{ duration: 6.5, ease: 'linear' }}
+                      className="absolute bottom-0 left-0 h-0.5 bg-pink-600 rounded-full"
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Prev / Next Slide Arrows & Counter */}
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => setCurrentSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)}
+              className="p-2.5 sm:p-3 rounded-xl bg-white hover:bg-neutral-950 text-neutral-800 hover:text-white border border-neutral-200 shadow-sm transition-all hover:scale-110 active:scale-95 cursor-pointer"
+              aria-label="Previous Slide"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+
+            {/* Slide Count Indicator */}
+            <div className="px-3 py-1.5 rounded-xl bg-white border border-neutral-200 text-xs font-mono font-bold text-neutral-700 shadow-xs">
+              <span className="text-pink-600">0{currentSlide + 1}</span> / 0{HERO_SLIDES.length}
+            </div>
+
+            <button
+              onClick={() => setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length)}
+              className="p-2.5 sm:p-3 rounded-xl bg-white hover:bg-neutral-950 text-neutral-800 hover:text-white border border-neutral-200 shadow-sm transition-all hover:scale-110 active:scale-95 cursor-pointer"
+              aria-label="Next Slide"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
 
         </div>
+
       </div>
     </section>
   );

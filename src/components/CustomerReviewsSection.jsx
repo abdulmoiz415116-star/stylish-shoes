@@ -73,8 +73,8 @@ export const CustomerReviewsSection = () => {
   return (
     <section id="reviews-section" className="py-20 bg-black text-white font-poppins relative overflow-hidden border-t border-neutral-900">
       {/* Background Subtle Luxury Rose/Pink Ambient Accents */}
-      <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-pink-600/10 blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-pink-500/10 blur-3xl pointer-events-none" />
+      <div className="hidden sm:block absolute -top-24 -left-24 w-96 h-96 rounded-full bg-pink-600/10 blur-3xl pointer-events-none" />
+      <div className="hidden sm:block absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-pink-500/10 blur-3xl pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         

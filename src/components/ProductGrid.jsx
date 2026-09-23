@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useShop } from '../context/ShopContext';
 import { CATEGORIES, SUBCATEGORY_META } from '../data/products';
 import { ProductCard } from './ProductCard';
@@ -22,7 +22,12 @@ export const ProductGrid = () => {
     setInStockOnlyFilter,
   } = useShop();
 
-  const [showAllProductsExpanded, setShowAllProductsExpanded] = useState(true);
+  const [visibleCount, setVisibleCount] = useState(24);
+
+  // When filters or category change, reset visible count to 24 for optimal mobile performance
+  useEffect(() => {
+    setVisibleCount(24);
+  }, [selectedCategory, selectedSubcategory, searchQuery, sortBy, maxPriceFilter, inStockOnlyFilter]);
 
   const currentCategoryObj = CATEGORIES.find((c) => c.id === selectedCategory);
   const subcategoriesList = currentCategoryObj ? currentCategoryObj.subcategories || [] : [];
@@ -284,16 +289,42 @@ export const ProductGrid = () => {
 
             {/* Product Cards Grid */}
             {filteredProducts.length > 0 ? (
-              <motion.div
-                layout
-                className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6"
-              >
-                <AnimatePresence>
-                  {filteredProducts.map((product) => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
-                </AnimatePresence>
-              </motion.div>
+              <>
+                <motion.div
+                  layout
+                  className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6"
+                >
+                  <AnimatePresence>
+                    {(searchQuery.trim() !== '' ? filteredProducts : filteredProducts.slice(0, visibleCount)).map((product) => (
+                      <ProductCard key={product.id} product={product} />
+                    ))}
+                  </AnimatePresence>
+                </motion.div>
+
+                {/* Load More / Progressive Pagination Controls */}
+                {searchQuery.trim() === '' && filteredProducts.length > visibleCount && (
+                  <div className="mt-12 text-center flex flex-col items-center justify-center gap-3">
+                    <p className="text-xs text-gray-500 font-semibold">
+                      Showing <span className="font-extrabold text-neutral-950">{Math.min(visibleCount, filteredProducts.length)}</span> of <span className="font-extrabold text-neutral-950">{filteredProducts.length}</span> items
+                    </p>
+                    <div className="flex flex-wrap items-center justify-center gap-3">
+                      <button
+                        onClick={() => setVisibleCount((prev) => prev + 24)}
+                        className="bg-black hover:bg-pink-600 text-white font-extrabold text-xs uppercase tracking-widest px-8 py-3.5 rounded-2xl shadow-lg hover:shadow-pink-500/20 active:scale-95 transition-all cursor-pointer flex items-center gap-2"
+                      >
+                        <span>Load More Products (مزید دیکھیں)</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => setVisibleCount(filteredProducts.length)}
+                        className="bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 font-bold text-xs uppercase tracking-wider px-5 py-3.5 rounded-2xl transition-all cursor-pointer"
+                      >
+                        Show All ({filteredProducts.length})
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
             ) : (
               /* Empty Search / Filter State */
               <div className="text-center py-20 bg-pink-50/50 rounded-2xl border border-dashed border-gray-200 max-w-md mx-auto my-8 font-poppins">

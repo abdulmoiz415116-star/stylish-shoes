@@ -25,6 +25,7 @@ export default {
       },
       fontFamily: {
         poppins: ['Poppins', 'sans-serif'],
+        urdu: ["'Noto Nastaliq Urdu'", 'serif'],
       }
     },
   },

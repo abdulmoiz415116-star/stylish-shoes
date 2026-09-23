@@ -29,14 +29,14 @@ export const SizeGuideModal = () => {
           {/* Header */}
           <div className="flex items-center justify-between border-b border-gray-200 pb-4">
             <div className="flex items-center gap-2">
-              <Ruler className="w-5 h-5 text-clive-gold" />
-              <h3 className="text-lg font-extrabold text-clive-dark uppercase font-poppins">
+              <Ruler className="w-5 h-5 text-pink-600" />
+              <h3 className="text-lg font-black text-neutral-950 uppercase font-poppins">
                 FOOTWEAR SIZE GUIDE
               </h3>
             </div>
             <button
               onClick={() => setIsSizeGuideOpen(false)}
-              className="p-1 rounded-full text-gray-400 hover:text-clive-dark"
+              className="p-1 rounded-full text-gray-400 hover:text-neutral-950 hover:bg-gray-100 transition-colors"
             >
               <X className="w-6 h-6" />
             </button>
@@ -48,8 +48,8 @@ export const SizeGuideModal = () => {
               <button
                 key={gender}
                 onClick={() => setActiveTab(gender)}
-                className={`pb-2 text-xs font-bold uppercase tracking-wider transition-colors relative ${
-                  activeTab === gender ? 'text-clive-gold border-b-2 border-clive-gold' : 'text-gray-500 hover:text-clive-dark'
+                className={`pb-2 text-xs font-black uppercase tracking-wider transition-colors relative ${
+                  activeTab === gender ? 'text-pink-600 border-b-2 border-pink-600 font-black' : 'text-gray-500 hover:text-neutral-950'
                 }`}
               >
                 {gender}'s Sizing
@@ -58,9 +58,9 @@ export const SizeGuideModal = () => {
           </div>
 
           {/* Table */}
-          <div className="overflow-x-auto border border-gray-200 rounded">
+          <div className="overflow-x-auto border border-gray-200 rounded-xl">
             <table className="w-full text-center text-xs">
-              <thead className="bg-clive-dark text-white uppercase tracking-wider font-semibold">
+              <thead className="bg-neutral-950 text-white uppercase tracking-wider font-semibold">
                 <tr>
                   <th className="py-2.5 px-3">EU Size</th>
                   <th className="py-2.5 px-3">US Size</th>
@@ -71,38 +71,38 @@ export const SizeGuideModal = () => {
               <tbody className="divide-y divide-gray-200 font-medium text-gray-700">
                 {activeTab === 'women' && (
                   <>
-                    <tr className="hover:bg-clive-cream"><td className="py-2">36</td><td>5.5</td><td>3.5</td><td>22.5 cm</td></tr>
-                    <tr className="hover:bg-clive-cream"><td className="py-2">37</td><td>6.5</td><td>4.5</td><td>23.5 cm</td></tr>
-                    <tr className="hover:bg-clive-cream"><td className="py-2">38</td><td>7.5</td><td>5.5</td><td>24.0 cm</td></tr>
-                    <tr className="hover:bg-clive-cream"><td className="py-2">39</td><td>8.5</td><td>6.5</td><td>24.8 cm</td></tr>
-                    <tr className="hover:bg-clive-cream"><td className="py-2">40</td><td>9.5</td><td>7.5</td><td>25.5 cm</td></tr>
-                    <tr className="hover:bg-clive-cream"><td className="py-2">41</td><td>10.5</td><td>8.5</td><td>26.2 cm</td></tr>
+                    <tr className="hover:bg-pink-50"><td className="py-2 font-bold">36</td><td>5.5</td><td>3.5</td><td>22.5 cm</td></tr>
+                    <tr className="hover:bg-pink-50"><td className="py-2 font-bold">37</td><td>6.5</td><td>4.5</td><td>23.5 cm</td></tr>
+                    <tr className="hover:bg-pink-50"><td className="py-2 font-bold">38</td><td>7.5</td><td>5.5</td><td>24.0 cm</td></tr>
+                    <tr className="hover:bg-pink-50"><td className="py-2 font-bold">39</td><td>8.5</td><td>6.5</td><td>24.8 cm</td></tr>
+                    <tr className="hover:bg-pink-50"><td className="py-2 font-bold">40</td><td>9.5</td><td>7.5</td><td>25.5 cm</td></tr>
+                    <tr className="hover:bg-pink-50"><td className="py-2 font-bold">41</td><td>10.5</td><td>8.5</td><td>26.2 cm</td></tr>
                   </>
                 )}
                 {activeTab === 'men' && (
                   <>
-                    <tr className="hover:bg-clive-cream"><td className="py-2">40</td><td>7.0</td><td>6.5</td><td>25.0 cm</td></tr>
-                    <tr className="hover:bg-clive-cream"><td className="py-2">41</td><td>8.0</td><td>7.5</td><td>25.8 cm</td></tr>
-                    <tr className="hover:bg-clive-cream"><td className="py-2">42</td><td>9.0</td><td>8.5</td><td>26.5 cm</td></tr>
-                    <tr className="hover:bg-clive-cream"><td className="py-2">43</td><td>10.0</td><td>9.5</td><td>27.3 cm</td></tr>
-                    <tr className="hover:bg-clive-cream"><td className="py-2">44</td><td>11.0</td><td>10.5</td><td>28.0 cm</td></tr>
-                    <tr className="hover:bg-clive-cream"><td className="py-2">45</td><td>12.0</td><td>11.5</td><td>28.8 cm</td></tr>
+                    <tr className="hover:bg-pink-50"><td className="py-2 font-bold">40</td><td>7.0</td><td>6.5</td><td>25.0 cm</td></tr>
+                    <tr className="hover:bg-pink-50"><td className="py-2 font-bold">41</td><td>8.0</td><td>7.5</td><td>25.8 cm</td></tr>
+                    <tr className="hover:bg-pink-50"><td className="py-2 font-bold">42</td><td>9.0</td><td>8.5</td><td>26.5 cm</td></tr>
+                    <tr className="hover:bg-pink-50"><td className="py-2 font-bold">43</td><td>10.0</td><td>9.5</td><td>27.3 cm</td></tr>
+                    <tr className="hover:bg-pink-50"><td className="py-2 font-bold">44</td><td>11.0</td><td>10.5</td><td>28.0 cm</td></tr>
+                    <tr className="hover:bg-pink-50"><td className="py-2 font-bold">45</td><td>12.0</td><td>11.5</td><td>28.8 cm</td></tr>
                   </>
                 )}
                 {activeTab === 'kids' && (
                   <>
-                    <tr className="hover:bg-clive-cream"><td className="py-2">28</td><td>10.5K</td><td>9.5K</td><td>17.5 cm</td></tr>
-                    <tr className="hover:bg-clive-cream"><td className="py-2">30</td><td>12.0K</td><td>11.0K</td><td>18.8 cm</td></tr>
-                    <tr className="hover:bg-clive-cream"><td className="py-2">32</td><td>1.0Y</td><td>13.0K</td><td>20.0 cm</td></tr>
-                    <tr className="hover:bg-clive-cream"><td className="py-2">34</td><td>2.5Y</td><td>2.0Y</td><td>21.5 cm</td></tr>
+                    <tr className="hover:bg-pink-50"><td className="py-2 font-bold">28</td><td>10.5K</td><td>9.5K</td><td>17.5 cm</td></tr>
+                    <tr className="hover:bg-pink-50"><td className="py-2 font-bold">30</td><td>12.0K</td><td>11.0K</td><td>18.8 cm</td></tr>
+                    <tr className="hover:bg-pink-50"><td className="py-2 font-bold">32</td><td>1.0Y</td><td>13.0K</td><td>20.0 cm</td></tr>
+                    <tr className="hover:bg-pink-50"><td className="py-2 font-bold">34</td><td>2.5Y</td><td>2.0Y</td><td>21.5 cm</td></tr>
                   </>
                 )}
               </tbody>
             </table>
           </div>
 
-          <div className="bg-clive-cream/80 p-3.5 rounded text-[11px] text-gray-600 space-y-1 border border-gray-200">
-            <strong className="text-clive-dark uppercase font-bold block">How to Measure Your Foot:</strong>
+          <div className="bg-pink-50/80 p-3.5 rounded-xl text-[11px] text-gray-700 space-y-1 border border-pink-100">
+            <strong className="text-neutral-950 uppercase font-black block">How to Measure Your Foot:</strong>
             <p>1. Stand straight on a piece of paper on a flat surface.</p>
             <p>2. Mark the longest tip of your toe and the back of your heel.</p>
             <p>3. Measure the distance with a ruler in centimeters and compare with the table above.</p>
@@ -110,7 +110,7 @@ export const SizeGuideModal = () => {
 
           <button
             onClick={() => setIsSizeGuideOpen(false)}
-            className="w-full bg-clive-dark hover:bg-clive-gold text-white py-3 rounded text-xs font-bold uppercase tracking-widest transition-colors shadow"
+            className="w-full bg-neutral-950 hover:bg-pink-600 text-white py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-md cursor-pointer active:scale-[0.99]"
           >
             Got It
           </button>

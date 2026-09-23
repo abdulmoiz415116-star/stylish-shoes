@@ -1035,7 +1035,7 @@ export const AdminPanel = () => {
                 </div>
               )}
 
-              {/* Top 4 KPI Cards (Salon & Pro Boutique Inventory Analytics) */}
+              {/* Top 4 KPI Cards (Store & Boutique Inventory Analytics) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 
                 {/* 1. Revenue */}

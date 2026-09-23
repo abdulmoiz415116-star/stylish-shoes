@@ -51,7 +51,6 @@ export const CheckoutModal = () => {
     fullName: customerProfile?.fullName || '',
     phone: customerProfile?.phone || '',
     address: customerProfile?.address || '',
-    city: customerProfile?.city || 'Lahore',
     notes: '',
     paymentMethod: 'cod', // 'cod', 'jazzcash'
     jazzcashTid: ''
@@ -123,7 +122,7 @@ export const CheckoutModal = () => {
     whatsappMsg += `📅 *Date:* ${orderDate}\n`;
     whatsappMsg += `👤 *Customer Name:* ${formData.fullName}\n`;
     whatsappMsg += `📞 *Phone Number:* ${formData.phone}\n`;
-    whatsappMsg += `📍 *Delivery Address:* ${formData.address}, ${formData.city}\n`;
+    whatsappMsg += `📍 *Delivery Address:* ${formData.address}\n`;
     whatsappMsg += `💳 *Payment Method:* CASH ON DELIVERY (COD)\n`;
     whatsappMsg += `\n📦 *ORDERED ITEMS (${cart.reduce((a, b) => a + b.quantity, 0)}):*\n`;
 
@@ -163,8 +162,7 @@ export const CheckoutModal = () => {
     saveCustomerProfile({
       fullName: formData.fullName,
       phone: formData.phone,
-      address: formData.address,
-      city: formData.city
+      address: formData.address
     });
 
     // Set order receipt with whatsapp url and message
@@ -194,7 +192,7 @@ export const CheckoutModal = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 font-poppins">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 flex items-center justify-center p-3 sm:p-4 font-poppins">
       <AnimatePresence>
         {/* Order Receipt Screen */}
         {orderReceipt ? (
@@ -203,7 +201,7 @@ export const CheckoutModal = () => {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative space-y-5 border border-pink-100 max-h-[90vh] overflow-y-auto font-poppins"
+            className="bg-white rounded-3xl max-w-lg w-full p-4 sm:p-8 shadow-2xl relative space-y-5 border border-pink-100 max-h-[92vh] overflow-y-auto font-poppins"
           >
             {/* Header Success Status */}
             <div className="text-center space-y-2">
@@ -247,7 +245,7 @@ export const CheckoutModal = () => {
               </div>
               <div className="flex justify-between text-gray-700">
                 <span className="text-gray-500">Address:</span>
-                <span className="font-bold text-neutral-950 text-right">{orderReceipt.customer.address}, {orderReceipt.customer.city}</span>
+                <span className="font-bold text-neutral-950 text-right">{orderReceipt.customer.address}</span>
               </div>
               <div className="flex justify-between text-gray-700">
                 <span className="text-gray-500">Payment Method:</span>
@@ -400,7 +398,7 @@ export const CheckoutModal = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="bg-white rounded-2xl max-w-xl w-full p-6 sm:p-8 shadow-2xl relative space-y-6 border border-pink-100 font-poppins max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-2xl max-w-xl w-full p-4 sm:p-8 shadow-2xl relative space-y-6 border border-pink-100 font-poppins max-h-[92vh] overflow-y-auto"
           >
             <div className="flex justify-between items-center border-b border-gray-100 pb-4">
               <div>
@@ -428,51 +426,31 @@ export const CheckoutModal = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-bold text-neutral-950 uppercase mb-1">WhatsApp Phone Number *</label>
-                  <input
-                    type="tel"
-                    required
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    placeholder="0300-1234567"
-                    className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl text-gray-900 focus:bg-white focus:border-pink-600 focus:outline-none transition-all font-medium"
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold text-neutral-950 uppercase mb-1">City *</label>
-                  <select
-                    name="city"
-                    value={formData.city}
-                    onChange={handleInputChange}
-                    className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl text-gray-900 focus:bg-white focus:border-pink-600 focus:outline-none font-bold"
-                  >
-                    <option value="Lahore">Lahore</option>
-                    <option value="Karachi">Karachi</option>
-                    <option value="Islamabad">Islamabad</option>
-                    <option value="Rawalpindi">Rawalpindi</option>
-                    <option value="Faisalabad">Faisalabad</option>
-                    <option value="Multan">Multan</option>
-                    <option value="Peshawar">Peshawar</option>
-                    <option value="Gujranwala">Gujranwala</option>
-                    <option value="Sialkot">Sialkot</option>
-                    <option value="Other">Other City</option>
-                  </select>
-                </div>
+              <div>
+                <label className="block font-bold text-neutral-950 uppercase mb-1">WhatsApp Phone Number *</label>
+                <input
+                  type="tel"
+                  required
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  placeholder="0300-1234567"
+                  className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl text-gray-900 focus:bg-white focus:border-pink-600 focus:outline-none transition-all font-medium text-xs"
+                />
               </div>
 
               <div>
-                <label className="block font-bold text-neutral-950 uppercase mb-1">Complete Delivery Address *</label>
+                <label className="block font-bold text-neutral-950 uppercase mb-1">
+                  Complete Delivery Address (مکمل ڈلیوری پتہ) *
+                </label>
                 <textarea
-                  rows={2}
+                  rows={3}
                   required
                   name="address"
                   value={formData.address}
                   onChange={handleInputChange}
-                  placeholder="House #, Street #, Sector / Area Name"
-                  className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl text-gray-900 focus:bg-white focus:border-pink-600 focus:outline-none transition-all font-medium"
+                  placeholder="House / Flat #, Street #, Sector / Area Name, City (مکان نمبر، گلی، علاقہ اور شہر کا نام)"
+                  className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl text-gray-900 focus:bg-white focus:border-pink-600 focus:outline-none transition-all font-medium text-xs leading-relaxed"
                 />
               </div>
 

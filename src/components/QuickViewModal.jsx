@@ -11,6 +11,7 @@ export const QuickViewModal = () => {
     wishlist,
     toggleWishlist,
     setIsSizeGuideOpen,
+    setIsCartOpen,
     showToast
   } = useShop();
 
@@ -54,6 +55,7 @@ export const QuickViewModal = () => {
   const handleAddToCart = () => {
     addToCart(quickViewProduct, selectedColor, selectedSize, quantity);
     setQuickViewProduct(null);
+    setIsCartOpen(true);
   };
 
   const handleCopyProductLink = () => {
@@ -97,7 +99,7 @@ export const QuickViewModal = () => {
           {/* Close Button */}
           <button
             onClick={() => setQuickViewProduct(null)}
-            className="absolute top-4 right-4 z-20 p-2 rounded-full bg-gray-100 text-gray-500 hover:text-clive-dark hover:bg-gray-200 transition-colors"
+            className="absolute top-4 right-4 z-20 p-2 rounded-full bg-gray-100 text-gray-500 hover:text-neutral-950 hover:bg-gray-200 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -164,8 +166,8 @@ export const QuickViewModal = () => {
                   {quickViewProduct.title}
                 </h3>
 
-                {/* Regular Price (NO SALE TAGS) */}
-                <div className="mt-2 text-2xl font-extrabold text-clive-dark font-poppins">
+                {/* Regular Price */}
+                <div className="mt-2 text-2xl font-black text-neutral-950 font-poppins">
                   Rs. {quickViewProduct.price.toLocaleString()}
                 </div>
 
@@ -177,17 +179,17 @@ export const QuickViewModal = () => {
                 {quickViewProduct.colors && (
                   <div className="mt-5">
                     <label className="block text-xs font-bold text-gray-800 uppercase tracking-wider mb-2">
-                      Color: <span className="text-clive-gold">{selectedColor}</span>
+                      Color: <span className="text-pink-600 font-extrabold">{selectedColor}</span>
                     </label>
                     <div className="flex flex-wrap gap-2">
                       {quickViewProduct.colors.map((color) => (
                         <button
                           key={color}
                           onClick={() => handleColorSelect(color)}
-                          className={`px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider border transition-all ${
+                          className={`px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider border transition-all cursor-pointer ${
                             selectedColor === color
-                              ? 'bg-clive-dark text-white border-clive-dark shadow'
-                              : 'bg-white text-gray-700 border-gray-300 hover:border-clive-dark'
+                              ? 'bg-neutral-950 text-white border-black shadow-sm ring-1 ring-pink-500'
+                              : 'bg-white text-gray-700 border-gray-300 hover:border-pink-600 hover:text-pink-600'
                           }`}
                         >
                           {color}
@@ -306,26 +308,37 @@ export const QuickViewModal = () => {
 
               {/* Action Buttons */}
               <div className="space-y-3 pt-4 border-t border-gray-100">
-                <div className="flex gap-3">
-                  <button
-                    onClick={handleAddToCart}
-                    className="flex-1 bg-clive-dark hover:bg-clive-gold text-white py-3 px-4 rounded font-bold text-xs uppercase tracking-widest transition-colors duration-200 shadow-md flex items-center justify-center gap-2"
-                  >
-                    <ShoppingBag className="w-4 h-4" />
-                    <span>Add To Shopping Bag</span>
-                  </button>
-                  <button
-                    onClick={() => toggleWishlist(quickViewProduct.id)}
-                    className={`p-3 rounded border transition-colors ${
-                      isWishlisted
-                        ? 'bg-clive-gold text-white border-clive-gold'
-                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                    }`}
-                    title="Wishlist"
-                  >
-                    <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
-                  </button>
-                </div>
+                {(() => {
+                  const currentStock = quickViewProduct.stockCount !== undefined ? quickViewProduct.stockCount : 15;
+                  const isOutOfStock = !quickViewProduct.inStock || currentStock <= 0;
+                  return (
+                    <div className="flex gap-3">
+                      <button
+                        onClick={handleAddToCart}
+                        disabled={isOutOfStock}
+                        className={`flex-1 py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-widest transition-all duration-200 shadow-md flex items-center justify-center gap-2 ${
+                          isOutOfStock
+                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                            : 'bg-neutral-950 hover:bg-pink-600 text-white cursor-pointer active:scale-[0.99]'
+                        }`}
+                      >
+                        <ShoppingBag className="w-4 h-4" />
+                        <span>{isOutOfStock ? 'Currently Out of Stock' : 'Add To Shopping Bag'}</span>
+                      </button>
+                      <button
+                        onClick={() => toggleWishlist(quickViewProduct.id)}
+                        className={`p-3 rounded-xl border transition-colors cursor-pointer ${
+                          isWishlisted
+                            ? 'bg-pink-600 text-white border-pink-600 shadow'
+                            : 'bg-white text-gray-700 border-gray-300 hover:text-pink-600 hover:border-pink-300'
+                        }`}
+                        title="Wishlist"
+                      >
+                        <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
+                      </button>
+                    </div>
+                  );
+                })()}
 
                 {/* Share Options */}
                 <div className="flex gap-2">
@@ -351,15 +364,15 @@ export const QuickViewModal = () => {
                 {/* Service Highlights */}
                 <div className="grid grid-cols-3 gap-2 pt-2 text-[10px] text-gray-500 text-center font-medium">
                   <div className="flex flex-col items-center">
-                    <Truck className="w-4 h-4 text-clive-gold mb-1" />
+                    <Truck className="w-4 h-4 text-pink-600 mb-1" />
                     <span>Nationwide Delivery</span>
                   </div>
                   <div className="flex flex-col items-center">
-                    <ShieldCheck className="w-4 h-4 text-clive-gold mb-1" />
+                    <ShieldCheck className="w-4 h-4 text-pink-600 mb-1" />
                     <span>100% Original</span>
                   </div>
                   <div className="flex flex-col items-center">
-                    <RefreshCw className="w-4 h-4 text-clive-gold mb-1" />
+                    <RefreshCw className="w-4 h-4 text-pink-600 mb-1" />
                     <span>7 Days Exchange</span>
                   </div>
                 </div>
