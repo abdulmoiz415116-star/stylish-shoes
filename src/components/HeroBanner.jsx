@@ -50,10 +50,8 @@ export const HeroBanner = () => {
     if (touchStartX.current === null) return;
     const diffX = touchStartX.current - e.changedTouches[0].clientX;
     if (diffX > 50) {
-      // Swipe left -> next slide
       setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
     } else if (diffX < -50) {
-      // Swipe right -> prev slide
       setCurrentSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
     }
     touchStartX.current = null;
@@ -61,45 +59,43 @@ export const HeroBanner = () => {
 
   return (
     <section 
-      className="relative w-full min-h-[540px] sm:min-h-[600px] lg:min-h-[660px] bg-white border-b border-neutral-200/80 overflow-hidden font-poppins select-none"
+      className="relative w-full bg-white border-b border-neutral-200/80 overflow-hidden font-poppins select-none"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* ========================================================= */}
-      {/* 1. RIGHT-ALIGNED TRANSPARENT PNG SLIDER CONTAINER */}
-      {/* ========================================================= */}
-      {/* On desktop: Isolated transparent PNG image cleanly positioned on the right */}
-      <div className="absolute top-0 right-0 bottom-0 w-full lg:w-[58%] z-0 bg-transparent overflow-hidden pointer-events-none flex items-center justify-end">
-        <AnimatePresence initial={false} mode="sync">
-          <motion.div
-            key={`hero-bg-${slide.id}`}
-            initial={{ opacity: 0, x: 50, scale: 0.95 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            exit={{ opacity: 0, x: -50, scale: 0.95 }}
-            transition={{ duration: 0.6, ease: [0.25, 1, 0.5, 1] }}
-            className="w-full h-full flex items-center justify-end pr-4 sm:pr-8 lg:pr-12"
-          >
-            <img
-              src={slide.image}
-              alt={slide.title}
-              className="w-auto h-auto max-h-[75%] max-w-[90%] lg:max-h-[82%] lg:max-w-[85%] object-contain filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.12)]"
-            />
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-      {/* ========================================================= */}
-      {/* 2. FOREGROUND 100% TRANSPARENT EDITORIAL CONTENT CONTAINER */}
-      {/* ========================================================= */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16 flex flex-col justify-between min-h-[540px] sm:min-h-[600px] lg:min-h-[660px]">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-14 flex flex-col justify-between min-h-[520px] sm:min-h-[580px] lg:min-h-[640px]">
         
-        {/* Main Grid: Left Column Text (50% width) / Right Column Open for Imagery */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center my-auto">
+        {/* ========================================================= */}
+        {/* MAIN SHOWCASE: PURE 2-COLUMN LAYOUT (ZERO OVERLAPPING)     */}
+        {/* Desktop: Left Text / Right Dedicated Transparent Product  */}
+        {/* Mobile: Top Product / Bottom Clean Readable Text          */}
+        {/* ========================================================= */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center my-auto">
           
+          {/* Visual Showcase: Dedicated Clean Area (On Mobile: Top, On Desktop: Right) */}
+          <div className="order-1 lg:order-2 lg:col-span-5 xl:col-span-5 flex items-center justify-center">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`showcase-img-${slide.id}`}
+                initial={{ opacity: 0, scale: 0.92, y: 15 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.92, y: -15 }}
+                transition={{ duration: 0.5, ease: [0.25, 1, 0.5, 1] }}
+                className="w-full flex items-center justify-center relative py-2 sm:py-4"
+              >
+                <img
+                  src={slide.image}
+                  alt={slide.title}
+                  className="w-auto h-auto max-h-[200px] sm:max-h-[280px] md:max-h-[340px] lg:max-h-[420px] xl:max-h-[450px] max-w-[95%] object-contain filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.14)] hover:scale-105 transition-transform duration-500 pointer-events-none"
+                />
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
           {/* Left Column: Pure Transparent Text with Zero Image Behind It */}
-          <div className="lg:col-span-6 xl:col-span-6">
+          <div className="order-2 lg:order-1 lg:col-span-7 xl:col-span-7">
             <AnimatePresence mode="wait">
               <motion.div
                 key={`content-${slide.id}`}
@@ -107,10 +103,10 @@ export const HeroBanner = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -16 }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
-                className="bg-white/90 lg:bg-transparent p-4 sm:p-6 lg:p-0 rounded-3xl lg:rounded-none space-y-4 sm:space-y-5 text-left"
+                className="space-y-4 sm:space-y-5 text-left"
               >
                 {/* Category Pill Tag & Department Badge */}
-                <div className="flex flex-wrap items-center gap-2.5">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
                   <div className="inline-flex items-center gap-2 bg-pink-50 text-pink-700 border border-pink-200 px-3.5 py-1 rounded-full shadow-xs">
                     <Sparkles className="w-3.5 h-3.5 text-pink-600 animate-pulse" />
                     <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em]">
@@ -126,42 +122,42 @@ export const HeroBanner = () => {
 
                 {/* Main Headline (Black & Radiant Pink) */}
                 <div className="space-y-1">
-                  <h1 className="text-3xl sm:text-4xl lg:text-[46px] font-black text-neutral-950 tracking-tight leading-[1.1] uppercase">
+                  <h1 className="text-2xl sm:text-4xl lg:text-[44px] font-black text-neutral-950 tracking-tight leading-[1.15] uppercase">
                     {slide.title}
                   </h1>
-                  <span className="block text-2xl sm:text-3xl lg:text-[36px] font-black text-pink-600 tracking-tight">
+                  <span className="block text-xl sm:text-3xl lg:text-[34px] font-black text-pink-600 tracking-tight leading-[1.15]">
                     {slide.subtitlePart2}
                   </span>
                 </div>
 
                 {/* Narrative Description */}
-                <p className="text-sm sm:text-base text-neutral-700 font-medium leading-relaxed max-w-lg">
+                <p className="text-xs sm:text-sm lg:text-base text-neutral-700 font-medium leading-relaxed max-w-xl">
                   {slide.description}
                 </p>
 
-                {/* Featured Product Floating Pill */}
-                <div className="inline-flex items-center gap-3 bg-white border border-neutral-200 p-2 sm:p-2.5 rounded-2xl shadow-sm">
-                  <div className="w-10 h-10 rounded-xl overflow-hidden bg-neutral-100 shrink-0 border border-neutral-200">
+                {/* Featured Product Pill */}
+                <div className="inline-flex items-center gap-2.5 sm:gap-3 bg-white border border-neutral-200 p-2 sm:p-2.5 rounded-2xl shadow-xs">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden bg-neutral-100 shrink-0 border border-neutral-200">
                     <img src={slide.image} alt={slide.productTitle} className="w-full h-full object-cover" />
                   </div>
                   <div className="text-left pr-2">
-                    <span className="text-[9px] uppercase font-bold text-neutral-500 tracking-wider block">
+                    <span className="text-[8px] sm:text-[9px] uppercase font-bold text-neutral-500 tracking-wider block">
                       FEATURED MASTERPIECE
                     </span>
-                    <span className="text-xs sm:text-sm font-black text-neutral-900 block truncate max-w-[180px] sm:max-w-xs">
+                    <span className="text-xs sm:text-sm font-black text-neutral-900 block truncate max-w-[160px] sm:max-w-xs">
                       {slide.productTitle}
                     </span>
                   </div>
-                  <div className="bg-pink-600 text-white font-black text-xs sm:text-sm px-3 py-1.5 rounded-xl ml-auto shadow-xs">
+                  <div className="bg-pink-600 text-white font-black text-xs sm:text-sm px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl ml-auto shadow-xs">
                     {slide.price}
                   </div>
                 </div>
 
                 {/* Call-to-Action Buttons */}
-                <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+                <div className="pt-1 sm:pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-4">
                   <button
                     onClick={() => handleCtaClick(slide.category, slide.subcategory || null)}
-                    className="group inline-flex items-center justify-center gap-3 bg-pink-600 hover:bg-neutral-950 text-white px-7 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-xs sm:text-sm font-black uppercase tracking-widest shadow-xl shadow-pink-600/30 transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] cursor-pointer"
+                    className="group inline-flex items-center justify-center gap-2.5 sm:gap-3 bg-pink-600 hover:bg-neutral-950 text-white px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-xs sm:text-sm font-black uppercase tracking-widest shadow-lg shadow-pink-600/30 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
                   >
                     <span>{slide.ctaPrimary}</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
@@ -169,7 +165,7 @@ export const HeroBanner = () => {
 
                   <button
                     onClick={() => handleCtaClick(slide.category, null)}
-                    className="inline-flex items-center justify-center gap-2 bg-white hover:bg-pink-50 text-neutral-950 hover:text-pink-600 px-6 sm:px-7 py-3.5 sm:py-4 rounded-2xl text-xs sm:text-sm font-black uppercase tracking-wider border-2 border-neutral-200 hover:border-pink-500 transition-all duration-200 shadow-sm cursor-pointer"
+                    className="inline-flex items-center justify-center gap-2 bg-white hover:bg-pink-50 text-neutral-950 hover:text-pink-600 px-5 sm:px-7 py-3 sm:py-4 rounded-2xl text-xs sm:text-sm font-black uppercase tracking-wider border-2 border-neutral-200 hover:border-pink-500 transition-all duration-200 shadow-xs cursor-pointer"
                   >
                     <ShoppingBag className="w-4 h-4 text-pink-600" />
                     <span>{slide.ctaSecondary}</span>
@@ -177,20 +173,20 @@ export const HeroBanner = () => {
                 </div>
 
                 {/* Trust Badges */}
-                <div className="pt-2 flex flex-wrap items-center gap-4 sm:gap-6 text-xs text-neutral-700 font-medium">
+                <div className="pt-1 sm:pt-2 flex flex-wrap items-center gap-3 sm:gap-6 text-[11px] sm:text-xs text-neutral-700 font-medium">
                   <div className="flex items-center gap-1.5 text-amber-500">
-                    <Star className="w-4 h-4 fill-amber-400 stroke-none" />
+                    <Star className="w-3.5 h-3.5 fill-amber-400 stroke-none" />
                     <span className="font-extrabold text-neutral-900">4.9 / 5.0</span>
-                    <span className="text-neutral-500 font-normal">(15k+ Reviews)</span>
+                    <span className="text-neutral-500 font-normal hidden sm:inline">(15k+ Reviews)</span>
                   </div>
                   <span className="text-neutral-300 hidden sm:inline">&bull;</span>
                   <div className="flex items-center gap-1.5">
-                    <Truck className="w-4 h-4 text-pink-600" />
+                    <Truck className="w-3.5 h-3.5 text-pink-600" />
                     <span className="font-semibold text-neutral-800">Free Delivery Above Rs. 4,000</span>
                   </div>
                   <span className="text-neutral-300 hidden sm:inline">&bull;</span>
                   <div className="flex items-center gap-1.5">
-                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                     <span className="font-semibold text-neutral-800">COD Across Pakistan</span>
                   </div>
                 </div>
@@ -198,15 +194,12 @@ export const HeroBanner = () => {
             </AnimatePresence>
           </div>
 
-          {/* Right Column: Visual Area (Dedicated to the right-aligned image) */}
-          <div className="hidden lg:block lg:col-span-6 xl:col-span-6" />
-
         </div>
 
         {/* ========================================================= */}
-        {/* 3. BOTTOM CONTROLS & INTERACTIVE 5 LOOKBOOK TABS */}
+        {/* 3. BOTTOM CONTROLS & INTERACTIVE 5 LOOKBOOK TABS          */}
         {/* ========================================================= */}
-        <div className="pt-6 sm:pt-8 border-t border-neutral-200 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="pt-6 sm:pt-8 mt-4 border-t border-neutral-200 flex flex-col md:flex-row items-center justify-between gap-4">
           
           {/* 5 Category Navigation Tabs with Live Progress */}
           <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-none">
